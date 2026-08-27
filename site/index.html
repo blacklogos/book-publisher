@@ -105,6 +105,11 @@
         "@type": "Question",
         "name": "Does Book Publisher send my manuscript anywhere?",
         "acceptedAnswer": { "@type": "Answer", "text": "No. Book Publisher runs entirely on your machine. Pandoc and WeasyPrint are local tools, the build script is offline Python, and your manuscript never leaves your computer. There is no server, no account, and no telemetry." }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I report a bug or send feedback about Book Publisher?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Report bugs and feature requests at github.com/blacklogos/book-publisher/issues. For anything else, email bookpublisher@cc4.marketing. Both channels are read by the maintainer." }
       }
     ]
   }
@@ -304,6 +309,17 @@
     .faq-a code { font-family: var(--font-mono); font-size: 13px; }
     .faq-item.open .faq-a { max-height: 340px; }
 
+    /* ── Donate ── */
+    .donate { padding: 48px 0 64px; }
+    .donate-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 36px 40px; align-items: start; }
+    .donate-method { border-top: 1px solid var(--rule); padding-top: 16px; }
+    .donate-method h3 { font-family: var(--font-serif); font-weight: 700; font-size: 18px; margin-bottom: 6px; }
+    .donate-method p { font-size: 15px; color: var(--muted); line-height: 1.6; margin-bottom: 14px; }
+    .donate-qr { max-width: 230px; width: 100%; border: 1px solid var(--rule); border-radius: var(--radius); }
+    .donate-caption { font-size: 13.5px; color: var(--muted); font-style: italic; margin-top: 8px; }
+    .donate-note { margin-top: 32px; font-size: 14px; color: var(--muted); font-style: italic; }
+    @media (max-width: 768px) { .donate-grid { grid-template-columns: 1fr; } }
+
     /* ── Footer ── */
     footer { padding: 28px 0 44px; border-top: 1px solid var(--ink); }
     .footer-inner { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 12px; }
@@ -342,6 +358,7 @@
           <a href="#how" class="header-link">How it works</a>
           <a href="#install" class="header-link">Install</a>
           <a href="#faq" class="header-link">FAQ</a>
+          <a href="#donate" class="header-link">Donate</a>
           <a href="https://github.com/blacklogos/book-publisher/releases/latest/download/book-publisher.zip" class="gh-btn" download>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Get the Zip
@@ -580,7 +597,41 @@
           <button class="faq-q" aria-expanded="false">Does it send my manuscript anywhere?<span class="faq-icon"><svg viewBox="0 0 10 10"><path d="M5 1v8M1 5h8"/></svg></span></button>
           <div class="faq-a"><p>No. Book Publisher runs entirely on your machine. Pandoc and WeasyPrint are local tools, the build script is offline Python, and your manuscript never leaves your computer. No server, no account, no telemetry.</p></div>
         </div>
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">How do I report a bug or send feedback?<span class="faq-icon"><svg viewBox="0 0 10 10"><path d="M5 1v8M1 5h8"/></svg></span></button>
+          <div class="faq-a"><p>Open an issue at <a href="https://github.com/blacklogos/book-publisher/issues">github.com/blacklogos/book-publisher/issues</a> for bugs and requests, or email <a href="mailto:bookpublisher@cc4.marketing">bookpublisher@cc4.marketing</a> for anything else. Both are read by a human.</p></div>
+        </div>
       </div>
+    </section>
+  </div>
+
+
+  <!-- Donate -->
+  <div class="container">
+    <section class="donate" id="donate">
+      <div class="section-heading">
+        <h2>Support the project</h2>
+        <p>Book Publisher is free and open source. If it saved you a layout weekend, a coffee keeps the themes coming.</p>
+      </div>
+      <div class="donate-grid">
+        <div class="donate-method">
+          <h3>PayPal</h3>
+          <p>One-time donation from anywhere.</p>
+          <a href="https://paypal.me/MinhTriVo?locale.x=en_US&country.x=VN" target="_blank" rel="noopener noreferrer" class="btn-secondary">Donate with PayPal</a>
+        </div>
+        <div class="donate-method">
+          <h3>Ko-fi</h3>
+          <p>Buy me a coffee or send a tip.</p>
+          <a href="https://ko-fi.com/cc4marketing" target="_blank" rel="noopener noreferrer" class="btn-secondary">Support on Ko-fi</a>
+        </div>
+        <div class="donate-method">
+          <h3>VietQR (Việt Nam)</h3>
+          <p>Quét mã bằng app ngân hàng bất kỳ (Napas 247).</p>
+          <img class="donate-qr" src="vietqr-tpbank.png" alt="VietQR chuyển khoản TPBank, VO MINH TRI, 0201 9971 401" loading="lazy" width="616" height="800">
+          <p class="donate-caption">TPBank · VO MINH TRI · 0201 9971 401</p>
+        </div>
+      </div>
+      <p class="donate-note">Donations fund theme development and keeping the skill current with agent tooling.</p>
     </section>
   </div>
 
@@ -589,7 +640,7 @@
     <footer>
       <div class="footer-inner">
         <span>Book Publisher, an agent skill</span>
-        <span><a href="https://github.com/blacklogos/book-publisher/releases/latest/download/book-publisher.zip" download>Download</a> · <a href="https://github.com/blacklogos/book-publisher">GitHub</a> · <a href="#faq">FAQ</a></span>
+        <span><a href="https://github.com/blacklogos/book-publisher/releases/latest/download/book-publisher.zip" download>Download</a> · <a href="https://github.com/blacklogos/book-publisher">GitHub</a> · <a href="https://github.com/blacklogos/book-publisher/issues">Issues</a> · <a href="mailto:bookpublisher@cc4.marketing">bookpublisher@cc4.marketing</a> · <a href="#donate">Donate</a> · <a href="#faq">FAQ</a></span>
       </div>
     </footer>
   </div>
