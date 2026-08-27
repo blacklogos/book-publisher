@@ -309,14 +309,50 @@
     .faq-a code { font-family: var(--font-mono); font-size: 13px; }
     .faq-item.open .faq-a { max-height: 340px; }
 
+    /* ── Feedback strip: the email, prominent ── */
+    .feedback-strip { padding: 40px 0 8px; text-align: center; }
+    .feedback-strip .label {
+      font-variant: small-caps; text-transform: lowercase; letter-spacing: 0.14em;
+      font-size: 15px; color: var(--muted); margin-bottom: 6px;
+    }
+    .feedback-strip a.mail {
+      font-family: var(--font-serif); font-style: italic;
+      font-size: clamp(24px, 3.4vw, 34px); color: var(--ink);
+      text-decoration: none; border-bottom: 1px solid var(--ink);
+    }
+    .feedback-strip a.mail:hover { color: var(--muted); border-color: var(--muted); }
+    .feedback-strip .alt { font-size: 14.5px; color: var(--muted); margin-top: 10px; }
+
     /* ── Donate ── */
     .donate { padding: 48px 0 64px; }
     .donate-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 36px 40px; align-items: start; }
     .donate-method { border-top: 1px solid var(--rule); padding-top: 16px; }
     .donate-method h3 { font-family: var(--font-serif); font-weight: 700; font-size: 18px; margin-bottom: 6px; }
     .donate-method p { font-size: 15px; color: var(--muted); line-height: 1.6; margin-bottom: 14px; }
-    .donate-qr { max-width: 230px; width: 100%; border: 1px solid var(--rule); border-radius: var(--radius); }
-    .donate-caption { font-size: 13.5px; color: var(--muted); font-style: italic; margin-top: 8px; }
+    /* Native VietQR card: typography matches the page, only the QR matrix is raster */
+    .qr-card {
+      max-width: 250px; margin: 0; padding: 20px 22px 16px;
+      border: 1px solid var(--ink); border-radius: var(--radius);
+      background: #ffffff; text-align: center;
+    }
+    .qr-bank {
+      font-family: var(--font-serif); font-weight: 700; font-size: 17px;
+      letter-spacing: 0.02em; margin-bottom: 10px;
+    }
+    .qr-holder {
+      font-variant: small-caps; text-transform: lowercase; letter-spacing: 0.14em;
+      font-size: 15px; color: var(--ink); margin-bottom: 2px;
+    }
+    .qr-account {
+      font-family: var(--font-mono); font-size: 14px; color: var(--muted);
+      letter-spacing: 0.08em; margin-bottom: 12px;
+    }
+    .qr-img { width: 100%; height: auto; display: block; }
+    .qr-rails {
+      display: flex; justify-content: space-between; margin-top: 10px;
+      font-variant: small-caps; text-transform: lowercase; letter-spacing: 0.1em;
+      font-size: 12.5px; color: var(--muted);
+    }
     .donate-note { margin-top: 32px; font-size: 14px; color: var(--muted); font-style: italic; }
     @media (max-width: 768px) { .donate-grid { grid-template-columns: 1fr; } }
 
@@ -606,6 +642,15 @@
   </div>
 
 
+  <!-- Feedback strip -->
+  <div class="container">
+    <section class="feedback-strip" id="feedback">
+      <p class="label">questions, bugs, love letters</p>
+      <a class="mail" href="mailto:bookpublisher@cc4.marketing">bookpublisher@cc4.marketing</a>
+      <p class="alt">Read by a human. Bugs travel faster via <a href="https://github.com/blacklogos/book-publisher/issues">GitHub Issues</a>.</p>
+    </section>
+  </div>
+
   <!-- Donate -->
   <div class="container">
     <section class="donate" id="donate">
@@ -627,8 +672,13 @@
         <div class="donate-method">
           <h3>VietQR (Việt Nam)</h3>
           <p>Quét mã bằng app ngân hàng bất kỳ (Napas 247).</p>
-          <img class="donate-qr" src="vietqr-tpbank.png" alt="VietQR chuyển khoản TPBank, VO MINH TRI, 0201 9971 401" loading="lazy" width="616" height="800">
-          <p class="donate-caption">TPBank · VO MINH TRI · 0201 9971 401</p>
+          <figure class="qr-card">
+            <figcaption class="qr-bank">TPBank</figcaption>
+            <p class="qr-holder">Vo Minh Tri</p>
+            <p class="qr-account">0201 9971 401</p>
+            <img class="qr-img" src="vietqr-code.png" alt="VietQR chuyển khoản TPBank, VO MINH TRI, 0201 9971 401" loading="lazy" width="478" height="482">
+            <p class="qr-rails"><span>VietQR</span><span>Napas 247</span></p>
+          </figure>
         </div>
       </div>
       <p class="donate-note">Donations fund theme development and keeping the skill current with agent tooling.</p>
