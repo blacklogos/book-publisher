@@ -1,0 +1,315 @@
+/* book-publisher theme: jianghu — translated-novel look reverse-engineered
+   from a Vietnamese-translated Chinese wuxia/xianxia sample ("Minh Hải
+   Cấm Địa", gioithieusach.com, 2026): first-line-indent body paragraphs
+   (no paragraph spacing), centered chapter openers with generous top
+   whitespace, a gold-rule "plate" frontmatter page, bottom-of-page
+   footnotes for in-story glossary terms, and roman-numeral front matter
+   pagination that resets to Arabic 1 at the first chapter. Distinct trim
+   (5.5x8.5in "digest" novel size) from boardroom/tufte's shared US Letter —
+   see references/themes.md for the derivation notes and the two WeasyPrint
+   mechanisms (float: footnote; named-page counter-reset) verified by real
+   render before writing this file. */
+
+:root {
+  /* Georgia/Times first, not a "book serif" like Palatino: this project's
+     own gotcha log (references/themes.md) found Palatino mispositions
+     Vietnamese combining tone marks. Georgia and Times New Roman both
+     shape Vietnamese correctly. */
+  --font-serif: Georgia, "Times New Roman", "Liberation Serif", "Book Antiqua", serif;
+  --c-navy: #1d3358;
+  --c-gold: #a9834f;
+  --c-ink: #1a1a1a;
+  --c-muted: #6f6f6f;
+  --c-paper: #fdfcf8;
+  --c-rule: #cfc7b0;
+  --c-cover-bg: #10203a;
+  --c-cover-fg: #f5f1e6;
+  --c-cover-accent: #c9a668;
+}
+
+* { box-sizing: border-box; }
+
+/* ---- page geometry ----
+   5.5x8.5in (396x612pt): a trade-paperback "digest" novel trim, distinct
+   from boardroom/tufte's shared US Letter — the reference is a novel meant
+   to be read start-to-finish, not a report or lead-magnet. */
+@page {
+  size: 396pt 612pt;
+  background: var(--c-paper);
+  margin: 54pt 48pt 60pt 48pt;
+  @top-right { font-family: var(--font-serif); font-variant: small-caps;
+               font-size: 8pt; letter-spacing: 0.05em; color: var(--c-muted); }
+  @bottom-right { font-family: var(--font-serif); font-size: 8.5pt; color: var(--c-muted); }
+  /* real per-page footnotes (verified: WeasyPrint supports CSS GCPM
+     `float: footnote` end to end — see the .footnote rule below). */
+  @footnote {
+    border-top: 0.75pt solid var(--c-rule);
+    padding-top: 6pt;
+    margin-top: 10pt;
+  }
+}
+
+@page cover {
+  size: 600pt 900pt;
+  margin: 0;
+  /* margin:0 alone doesn't stop the generic @page rule's running-header/
+     footer *content* from painting past a zero-size margin box (same
+     gotcha documented in the other two themes) — explicitly clear it. */
+  @top-right { content: none; }
+  @bottom-left { content: none; }
+  @bottom-right { content: none; }
+}
+
+/* ---- front-matter / main-matter pagination split ----
+   Front matter (copyright/title-restatement/character-list page, and the
+   promo page if used) counts in lower-roman, matching real book front
+   matter. The first Chapter resets to Arabic 1. Both mechanisms only
+   fire inside an @page rule in WeasyPrint (confirmed empirically —
+   `counter-reset: page` on a normal body element is silently ignored),
+   hence the two named pages instead of a simpler per-element reset.
+   `section.statement` (tag+class) deliberately scopes to the templated
+   front-matter promo only: a *mid-book* `::: statement :::` fenced div
+   compiles to `<div class="statement">` nested inside article.content,
+   not a `<section>` direct child of body, so it never matches this rule
+   and correctly keeps Arabic numbering. `#TOC` is included too: pandoc's
+   table of contents renders inside article.content but *before* the
+   first real h1 (see template.pdf.html5), so without this it would
+   display Arabic page numbers one page early — the counter itself
+   would still reset correctly at the first Chapter either way, this is
+   purely about what the TOC page's own folio reads while it's still
+   conceptually front matter. */
+section.frontmatter, section.statement, #TOC {
+  page: frontmatter;
+}
+@page frontmatter {
+  size: 396pt 612pt;
+  background: var(--c-paper);
+  margin: 54pt 48pt 60pt 48pt;
+  @bottom-right { content: counter(page, lower-roman); font-family: var(--font-serif); font-size: 8.5pt; color: var(--c-muted); }
+}
+article.content > h1:first-of-type {
+  page: mainmatter;
+}
+@page mainmatter {
+  size: 396pt 612pt;
+  background: var(--c-paper);
+  margin: 54pt 48pt 60pt 48pt;
+  counter-reset: page 1;
+  @top-right { font-family: var(--font-serif); font-variant: small-caps;
+               font-size: 8pt; letter-spacing: 0.05em; color: var(--c-muted); }
+  @bottom-right { content: counter(page); font-family: var(--font-serif); font-size: 8.5pt; color: var(--c-muted); }
+  @footnote { border-top: 0.75pt solid var(--c-rule); padding-top: 6pt; margin-top: 10pt; }
+}
+
+html { background: var(--c-paper); }
+body {
+  font-family: var(--font-serif); color: var(--c-ink); background: var(--c-paper);
+  font-size: 10.5pt; line-height: 1.6;
+}
+article.content { orphans: 3; widows: 3; }
+
+/* ---- body paragraphs: first-line indent, no inter-paragraph gap ----
+   The reference sets new paragraphs apart by indent alone (classic novel
+   typesetting), not by a blank-line gap like boardroom/tufte — the opposite
+   paragraph model from both existing themes. The paragraph right after a
+   heading is flush (no indent), matching how the reference's own
+   "MỞ ĐẦU" opener reads. Justified, but hyphens intentionally left at
+   the CSS default (`manual`, not `auto`): auto-hyphenation mis-broke a
+   real Vietnamese word in testing (dictionary-based hyphenation isn't
+   Vietnamese-aware) — see references/themes.md. */
+p { margin: 0; text-indent: 1.4em; text-align: justify; }
+h1 + p, h2 + p, h3 + p, h4 + p,
+section.frontmatter > p:first-child, .statement p:first-child { text-indent: 0; }
+strong { font-weight: 700; }
+em { font-style: italic; }
+a { color: var(--c-navy); text-decoration: underline; }
+
+/* ---- heading system: h1=Part, h2=Chapter, h3=Section ----
+   Centered chapter-opener convention (the reference's "MỞ ĐẦU" heading
+   is centered with generous whitespace above it), unlike boardroom/tufte's
+   left-aligned headings — the top margin lives on h1 since only h1
+   forces the page break (see content-model.md's "repeat the Part
+   heading before every Chapter" rule; the rationale is identical here). */
+h1 {
+  page-break-before: always;
+  font-family: var(--font-serif); font-variant: small-caps; font-weight: 400;
+  font-size: 10.5pt; letter-spacing: 0.06em; color: var(--c-muted);
+  text-align: center; margin: 130pt 0 6pt 0;
+}
+h2 {
+  font-family: var(--font-serif); font-weight: 700; font-size: 17pt;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--c-navy); text-align: center; margin: 0 0 26pt 0;
+  page-break-after: avoid;
+}
+h3 {
+  font-family: var(--font-serif); font-style: italic; font-weight: 400;
+  font-size: 13pt; color: var(--c-ink); text-align: center;
+  margin: 20pt 0 10pt 0; page-break-after: avoid;
+}
+h4 {
+  font-family: var(--font-serif); font-style: italic; font-weight: 400;
+  font-size: 11pt; color: var(--c-ink); margin: 14pt 0 6pt 0;
+  page-break-after: avoid;
+}
+
+hr { border: 0; border-top: 0.75pt solid var(--c-rule); width: 36%; margin: 14pt auto; }
+
+/* ---- footnotes: real bottom-of-page notes (CSS GCPM `float: footnote`) --
+   Hand-authored raw HTML at the point of reference, same authoring
+   pattern as the tufte theme's sidenotes (there's no lighter Markdown
+   syntax for either upstream): word<span class="footnote">Note text.</span>
+   Verified end to end against this exact CSS before writing the theme —
+   WeasyPrint pulls each .footnote to the bottom of whichever page its
+   call ends up on and numbers it via the ::footnote-* pseudo-elements,
+   no manual page-tracking needed. */
+.footnote {
+  float: footnote;
+  font-family: var(--font-serif);
+  font-size: 8.5pt; line-height: 1.4; color: var(--c-muted);
+  text-indent: 0;
+}
+::footnote-call { content: counter(footnote); vertical-align: super; font-size: 0.68em; }
+::footnote-marker { content: counter(footnote) ". "; font-weight: 700; color: var(--c-ink); }
+/* themes without a footnote convention (boardroom) don't define .footnote at
+   all, so a jianghu-authored manuscript built under them would otherwise
+   render the note text as a stray inline run — harmless, but note that
+   asymmetry rather than treat it as a bug in either theme. */
+
+/* ---- checklists: "- [ ] **Label:** text" (pandoc task_lists) ---- */
+ul.task-list { list-style: none; padding-left: 0; margin: 0 0 14pt 0; }
+ul.task-list li { margin-bottom: 8pt; page-break-inside: avoid; }
+ul.task-list label { display: block; overflow: hidden; }
+ul.task-list input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none;
+  float: left;
+  width: 9pt; height: 9pt; margin: 3pt 8pt 0 0;
+  border: 1pt solid var(--c-navy); background: var(--c-paper);
+}
+
+/* ---- full-page statement / promo block (fenced div `::: statement`) ----
+   Epigraph treatment: centered italic serif, the novel-frontispiece
+   convention — quote-then-attribution, not boardroom's bold sans CTA. */
+.statement { page-break-before: always; page-break-after: always; padding-top: 190pt; text-align: center; }
+.statement p {
+  font-family: var(--font-serif); font-style: italic; font-weight: 400;
+  font-size: 15pt; line-height: 1.5; color: var(--c-ink);
+  max-width: 300pt; margin: 0 auto; text-indent: 0;
+}
+.statement p + p { font-style: normal; font-size: 10pt; color: var(--c-muted); margin-top: 14pt; }
+
+/* ---- end-of-chapter framed lesson box (fenced div `::: lesson-box`) ----
+   For a nonfiction-lesson-inside-fiction format (a journal-narrative
+   chapter followed by a boxed takeaway) — distinct from `.statement`:
+   this stays inline in the chapter flow and does not force a page break,
+   `.statement` is a dedicated full page. Single gold rule + left accent
+   bar rather than the frontmatter plate's double border, so the two
+   don't read as the same component at a glance. */
+.lesson-box {
+  margin: 22pt 0 6pt 0;
+  padding: 14pt 18pt;
+  border: 0.75pt solid var(--c-gold);
+  border-left: 2.5pt solid var(--c-gold);
+  page-break-inside: avoid;
+}
+.lesson-box p {
+  text-indent: 0; text-align: left;
+  font-size: 9.5pt; line-height: 1.55; margin: 0 0 8pt 0;
+}
+.lesson-box p:last-child { margin-bottom: 0; }
+.lesson-box strong { color: var(--c-navy); }
+
+/* ---- front matter (copyright / title-restatement / character-list page)
+   A bordered "plate" rather than plain text — the closest CSS-only
+   approximation of the reference's ornate engraved title-page frame
+   without commissioning bespoke art for every theme (see themes.md for
+   the tradeoff note; an illustrated frame is a documented future
+   upgrade, not required to get the effect). Works for both a restated
+   title/author block and the `**Name.** description.` character-list
+   convention already documented in content-model.md's "Definition
+   paragraph" pattern — no new manuscript syntax needed. */
+section.frontmatter {
+  font-size: 9.5pt; color: var(--c-ink); text-align: center;
+  border: 1.5pt double var(--c-gold);
+  padding: 30pt 26pt;
+  margin-top: 20pt;
+}
+section.frontmatter p {
+  text-align: left; margin: 0 0 9pt 0; line-height: 1.5;
+}
+section.frontmatter p:first-child::before {
+  content: "\2726"; display: block; text-align: center;
+  color: var(--c-gold); font-size: 11pt; margin-bottom: 12pt;
+}
+
+/* ---- table of contents (pandoc --toc output) ---- */
+#TOC { margin: 0 0 24pt 0; text-align: center; }
+#TOC > ul { list-style: none; padding-left: 0; margin: 0; }
+#TOC > ul > li { margin-top: 16pt; }
+#TOC a { text-decoration: none; color: inherit; }
+#TOC > ul > li > a { font-variant: small-caps; font-size: 10pt; letter-spacing: 0.04em; color: var(--c-muted); }
+#TOC ul ul { list-style: none; padding-left: 0; margin: 4pt 0 0 0; }
+#TOC ul ul > li { margin-top: 5pt; }
+#TOC ul ul > li > a { font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; font-size: 11pt; color: var(--c-navy); }
+#TOC ul ul ul { padding-left: 0; }
+#TOC ul ul ul > li { margin-top: 2pt; }
+#TOC ul ul ul > li > a { font-style: italic; font-weight: 400; font-size: 9.5pt; color: var(--c-muted); }
+
+/* ---- cover (page 1 only, custom 600x900pt trim, full bleed) ----
+   Title block anchored in the lower third and centered, matching the
+   reference cover's composition (art fills the frame, title sits low
+   and center rather than boardroom's upper-left block). */
+.cover {
+  page: cover; position: relative;
+  width: 600pt; height: 900pt;
+  background: var(--c-cover-bg); color: var(--c-cover-fg);
+  display: flex; flex-direction: column; justify-content: flex-end;
+  align-items: center; text-align: center;
+  padding: 60pt 50pt 90pt 50pt;
+}
+.cover-title {
+  page-break-before: avoid; font-variant: normal; letter-spacing: 0.02em;
+  font-family: var(--font-serif); font-weight: 700; font-size: 42pt;
+  line-height: 1.15; margin: 0; color: var(--c-cover-fg);
+  text-indent: 0; text-align: center;
+  position: relative; /* see themes/tufte/pdf.css for why: without this,
+    the illustrated-cover ::before gradient (positioned) paints over this
+    text instead of behind it. */
+}
+.cover-subtitle {
+  font-family: var(--font-serif); font-style: italic; font-weight: 400;
+  font-size: 14pt; color: var(--c-cover-accent); margin: 14pt 0 0 0;
+  line-height: 1.3; text-indent: 0;
+  position: relative; /* see .cover-title */
+}
+.cover-logo {
+  position: absolute; left: 0; right: 0; top: 34pt;
+  font-family: var(--font-serif); font-variant: small-caps;
+  font-size: 11pt; letter-spacing: 0.12em; text-align: center;
+  color: var(--c-cover-accent);
+}
+
+/* This theme has no margin rail for sidenotes (see the tufte theme).
+   Hide them cleanly instead of rendering broken inline checkboxes if a
+   tufte-authored manuscript is ever built with --theme jianghu. */
+.margin-toggle, .sidenote, .marginnote { display: none; }
+
+/* ---- inline body images (illustrations, screenshots, placeholders) ---- */
+article.content img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 14pt auto;
+}
+
+/* ---- illustrated cover (optional) ----
+   Set via YAML front matter: `cover-image: "/absolute/path/to/art.png"`.
+   Mirrors the other two themes' mechanism — see tufte/pdf.css for the
+   full note on why this is a `::before` overlay and not a second
+   `background-image` layer. Tint is this theme's own deep-navy cover
+   color, matching the reference's moonlit/midnight art mood. */
+.cover[style]::before {
+  content: "";
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+  background: linear-gradient(rgba(16, 32, 58, 0.15), rgba(16, 32, 58, 0.55) 60%, rgba(16, 32, 58, 0.88));
+}

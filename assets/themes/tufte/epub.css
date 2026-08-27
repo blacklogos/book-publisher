@@ -1,0 +1,50 @@
+/* book-publisher theme: tufte — EPUB (reflowable)
+   Sidenotes can't float in reflowable text the way they do on a fixed
+   page, so .sidenote/.marginnote degrade to plain inline notes here
+   instead of being hidden or broken. */
+
+:root {
+  /* see the matching note in themes/tufte/pdf.css: Georgia first, not
+     Palatino, for correct Vietnamese (and generally broader Unicode)
+     combining-mark rendering. */
+  --font-serif: Georgia, "Palatino Linotype", "Times New Roman", "Book Antiqua", Palatino, serif;
+  --c-ink: #111111;
+  --c-muted: #666666;
+}
+
+body { font-family: var(--font-serif); color: var(--c-ink); line-height: 1.5; }
+
+h1 {
+  font-variant: small-caps; font-weight: 400; font-size: 1em;
+  color: var(--c-muted); margin: 0 0 0.2em 0; break-before: page;
+}
+h2 { font-weight: 400; font-size: 1.8em; line-height: 1.1; margin: 0 0 0.5em 0; }
+h3 { font-style: italic; font-weight: 400; font-size: 1.25em; margin: 1.2em 0 0.4em 0; }
+h4 { font-style: italic; font-weight: 400; font-size: 1.05em; margin: 1em 0 0.3em 0; }
+p { margin: 0 0 0.8em 0; }
+a { color: inherit; }
+span.newthought { font-variant: small-caps; font-size: 1.1em; }
+hr { border: 0; border-top: 1px solid #ccc; width: 40%; margin: 1em 0; }
+
+.sidenote, .marginnote {
+  display: inline; font-size: 0.85em; color: var(--c-muted); font-style: italic;
+}
+.sidenote-number { font-size: 0.7em; vertical-align: super; }
+
+ul.task-list { list-style: none; padding-left: 0; }
+ul.task-list li { margin-bottom: 0.6em; }
+ul.task-list label { display: flex; align-items: flex-start; gap: 0.5em; }
+ul.task-list input[type="checkbox"] { margin-top: 0.2em; }
+
+.statement p { font-style: italic; font-size: 1.3em; line-height: 1.4; }
+.statement p + p { font-style: normal; font-size: 1em; margin-top: 1em; }
+
+.frontmatter { font-size: 0.9em; }
+
+nav#TOC ul { list-style: none; padding-left: 0; }
+nav#TOC ul ul { padding-left: 1em; }
+
+/* inline body images: reflowable EPUB needs the same cap as the PDF
+   theme (see pdf.css) so a native-resolution illustration doesn't
+   overflow the reader's viewport on narrow screens/e-ink devices. */
+img { display: block; max-width: 100%; height: auto; margin: 1em auto; }

@@ -1,0 +1,20 @@
+/* book-publisher theme: tufte — facing-pages overlay (opt-in via
+   scripts/build_book.py --facing-pages). See the matching file in
+   themes/boardroom/ for how this combines with template.pdf.html5's
+   $if(facing-pages)$ content rules.
+
+   Deliberately does NOT mirror the sidenote rail to the left edge on
+   verso pages, unlike boardroom's wide-margin mirroring. Real printed
+   Tufte-style books alternate which side carries notes per spread, but
+   that requires knowing, at layout time, which physical page a given
+   note will land on — CSS has no selector for "content that happens to
+   fall on a left page" (page assignment is a pagination-time concern,
+   not something a content selector can react to). `.sidenote` stays
+   `float: right` everywhere; mirroring only @page :left's margin to
+   put the rail on the left, without also flipping the float direction
+   of every note, would just make notes overflow off a now-54pt-wide
+   right margin on verso pages — worse than not mirroring. If this
+   matters for a real print run, it needs a human layout pass (or a
+   proper DTP tool), not this pipeline. */
+
+h1 { page-break-before: right; }

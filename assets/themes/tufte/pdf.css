@@ -1,0 +1,237 @@
+/* book-publisher theme: tufte — adapted from Tufte CSS (Dave Liepmann,
+   MIT license, github.com/edwardtufte/tufte-css), the design behind
+   https://luhmann.surge.sh/learning-how-to-read. Monochrome, serif,
+   understated: the opposite instinct from the "boardroom" theme's color-
+   coded corporate look. See references/themes.md for the adaptation
+   notes (why sidenotes use float instead of the source's negative-
+   margin web hack, why heading sizes are remapped to Part/Chapter/
+   Section semantics instead of tufte's literal h1>h2>h3 sizing). */
+
+:root {
+  /* Georgia first, not Palatino (tufte-css's own first choice): on this
+     host, macOS's actual Palatino.ttc mispositions Vietnamese combining
+     tone marks badly enough to garble the text (verified by rendering
+     the same sentence in both — see themes.md). Georgia and Times New
+     Roman both shape Vietnamese correctly and read close enough to
+     Palatino's "book serif" feel that the swap doesn't change the
+     theme's character. */
+  --font-serif: Georgia, "Palatino Linotype", "Times New Roman", "Book Antiqua", Palatino, serif;
+  --font-sans: "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
+  --c-paper: #fffff8;
+  --c-ink: #111111;
+  --c-muted: #666666;
+  --c-rule: #cccccc;
+}
+
+* { box-sizing: border-box; }
+
+@page {
+  size: letter;
+  /* Paint the whole sheet, margins included: WeasyPrint doesn't extend
+     html/body's background into the page-margin area on its own, which
+     left a visible seam between this theme's off-white paper and the
+     plain-white margin frame. */
+  background: var(--c-paper);
+  /* Modest left margin, wide right margin — the Tufte "sidenote rail".
+     Same page geometry idea as tufte-css's fluid 55%-column layout,
+     rebuilt for a fixed print page instead of a browser viewport: the
+     rail is real @page margin, not a negative-margin float bled into a
+     wider viewport (there is no wider viewport on a fixed print page). */
+  margin: 60pt 200pt 60pt 54pt;
+  @top-right   { font-family: var(--font-serif); font-variant: small-caps;
+                 font-size: 8pt; letter-spacing: 0.04em; color: var(--c-muted); }
+  @bottom-left { font-family: var(--font-serif); font-variant: small-caps;
+                 font-size: 8pt; letter-spacing: 0.04em; color: var(--c-muted); }
+  @bottom-right{ font-family: var(--font-serif); font-size: 8pt; color: var(--c-muted); }
+}
+
+@page cover {
+  size: 600pt 900pt;
+  margin: 0;
+  /* margin:0 alone doesn't stop the generic @page rule's running-header/
+     footer *content* (declared in template.pdf.html5's inline <style>,
+     which matches every page including this one) from painting past a
+     zero-size margin box — explicitly clear it here. Only visible as a
+     bug on light cover backgrounds; silently present on dark ones too. */
+  @top-right { content: none; }
+  @bottom-left { content: none; }
+  @bottom-right { content: none; }
+}
+
+/* html, not just body: WeasyPrint only extends the *content* box's
+   background to the full page canvas (margins included) when it comes
+   from the root element — body-only left the page-margin frame pure
+   white against this theme's off-white paper, a visible seam. */
+html { background: var(--c-paper); }
+body {
+  font-family: var(--font-serif); color: var(--c-ink); background: var(--c-paper);
+  font-size: 11pt; line-height: 1.5;
+}
+article.content { orphans: 3; widows: 3; }
+
+/* ---- heading system: h1=Part, h2=Chapter, h3=Section ----
+   Tufte CSS itself makes h1 the largest (document title) and h2/h3
+   progressively smaller italics. book-publisher's semantics put the
+   Chapter heading, not the Part label, as what a reader scans for —
+   so the tufte h1 treatment is applied to h2 here, and h1 (Part)
+   becomes a small running label instead. Same page-break convention
+   as every other theme: only h1 breaks, so repeat `# Part` before
+   every `## Chapter` in the manuscript. */
+h1 {
+  page-break-before: always;
+  font-family: var(--font-serif); font-variant: small-caps; font-weight: 400;
+  font-size: 11pt; letter-spacing: 0.03em; color: var(--c-muted);
+  margin: 0 0 4pt 0;
+}
+h2 {
+  font-family: var(--font-serif); font-weight: 400; font-size: 30pt;
+  line-height: 1.05; color: var(--c-ink); margin: 0 0 16pt 0;
+  page-break-after: avoid;
+}
+h3 {
+  font-family: var(--font-serif); font-style: italic; font-weight: 400;
+  font-size: 17pt; color: var(--c-ink); margin: 22pt 0 6pt 0;
+  page-break-after: avoid;
+}
+h4 {
+  font-family: var(--font-serif); font-style: italic; font-weight: 400;
+  font-size: 13pt; color: var(--c-ink); margin: 16pt 0 4pt 0;
+  page-break-after: avoid;
+}
+p { margin: 0 0 11pt 0; text-align: justify; hyphens: auto; }
+strong { font-weight: 700; }
+em { font-style: italic; }
+a { color: inherit; text-decoration: underline; text-decoration-color: var(--c-rule); }
+
+/* opening word/phrase of an article set in small caps, tufte's
+   "newthought" convention for marking a fresh line of argument */
+span.newthought { font-variant: small-caps; font-size: 1.15em; }
+
+hr { border: 0; border-top: 1pt solid var(--c-rule); width: 40%; margin: 1em 0; }
+
+/* ---- sidenotes / margin notes ----
+   Hand-authored raw HTML (see content-model.md): a note that floats
+   into the @page right margin (reserved above at 200pt) next to where
+   it's referenced, instead of a bottom-of-page footnote. Fixed pt
+   values, not tufte-css's negative-margin percentage: percentages here
+   would resolve against the 358pt content column, not the page, so a
+   %-based negative margin can't reliably land inside a 200pt margin
+   that's a different container altogether — pt keeps the arithmetic
+   exact. Right edge lands 10pt inside the page's outer edge, left edge
+   starts 20pt clear of the content column. */
+.sidenote, .marginnote {
+  float: right; clear: right;
+  width: 170pt; margin-right: -190pt;
+  font-size: 9pt; line-height: 1.35; color: var(--c-muted);
+}
+.sidenote-number { font-size: 0.7em; vertical-align: super; }
+/* the tap-to-reveal checkbox is a mobile-web affordance with no print
+   equivalent; hide it instead of rendering a stray checkbox mid-line */
+input.margin-toggle { display: none; }
+
+/* ---- checklists: "- [ ] **Label:** text" (pandoc task_lists) ---- */
+ul.task-list { list-style: none; padding-left: 0; margin: 0 0 14pt 0; }
+ul.task-list li { margin-bottom: 8pt; page-break-inside: avoid; }
+ul.task-list label { display: block; overflow: hidden; }
+ul.task-list input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none;
+  float: left;
+  width: 9pt; height: 9pt; margin: 3pt 8pt 0 0;
+  border: 1pt solid var(--c-ink); background: var(--c-paper);
+}
+
+/* ---- full-page statement / promo block (fenced div `::: statement`) ---
+   Epigraph treatment: large italic serif, not boardroom's bold black sans. */
+.statement { page-break-before: always; page-break-after: always; padding-top: 170pt; }
+.statement p {
+  font-family: var(--font-serif); font-style: italic; font-weight: 400;
+  font-size: 20pt; line-height: 1.4; color: var(--c-ink); max-width: 380pt;
+}
+.statement p + p { font-style: normal; font-size: 11pt; margin-top: 18pt; }
+
+/* ---- front matter (copyright page etc.) ---- */
+.frontmatter { font-size: 10pt; color: var(--c-ink); }
+.frontmatter p { margin: 0 0 10pt 0; }
+
+/* ---- table of contents (pandoc --toc output) ---- */
+#TOC { margin: 0 0 24pt 0; }
+#TOC > ul { list-style: none; padding-left: 0; margin: 0; }
+#TOC > ul > li { margin-top: 16pt; }
+#TOC a { text-decoration: none; color: inherit; }
+#TOC > ul > li > a { font-variant: small-caps; font-size: 11pt; color: var(--c-muted); }
+#TOC ul ul { list-style: none; padding-left: 0; margin: 3pt 0 0 0; }
+#TOC ul ul > li { margin-top: 3pt; }
+#TOC ul ul > li > a { font-style: italic; font-size: 14pt; color: var(--c-ink); }
+#TOC ul ul ul { padding-left: 0; }
+#TOC ul ul ul > li { margin-top: 1pt; }
+#TOC ul ul ul > li > a { font-style: normal; font-size: 10pt; color: var(--c-muted); }
+
+/* ---- cover (page 1 only, custom 600x900pt trim) ----
+   No color block — the whole point of this theme is restraint. Paper
+   background, a large light-weight serif title, a thin rule. */
+.cover {
+  page: cover; position: relative;
+  width: 600pt; height: 900pt;
+  background: var(--c-paper); color: var(--c-ink);
+  padding: 150pt 70pt 70pt 70pt;
+}
+.cover-title {
+  /* explicit resets: .cover-title is an <h1>, and the generic h1 rule
+     above (Part-label styling) would otherwise leak its small-caps/
+     letter-spacing/muted-color/page-break through, since .cover-title
+     only overrides what it names and the cascade is per-property. */
+  page-break-before: avoid; font-variant: normal; letter-spacing: normal;
+  font-family: var(--font-serif); font-weight: 400; font-size: 46pt;
+  line-height: 1.1; margin: 0; color: var(--c-ink);
+  /* position:relative (no offset, so no layout effect on a plain
+     cover): without this, a non-positioned in-flow element paints
+     *before* a positioned z-index:auto sibling regardless of source
+     order, so the illustrated cover's ::before gradient (positioned)
+     would paint over this text instead of behind it. Reproduced by
+     actually rendering an illustrated cover before adding this. */
+  position: relative;
+}
+.cover-subtitle {
+  font-family: var(--font-serif); font-style: italic; font-weight: 400;
+  font-size: 17pt; color: var(--c-muted); margin: 16pt 0 0 0; line-height: 1.3;
+  position: relative; /* see .cover-title */
+}
+.cover-logo {
+  position: absolute; left: 70pt; bottom: 70pt;
+  font-family: var(--font-serif); font-variant: small-caps;
+  font-size: 11pt; letter-spacing: 0.08em; color: var(--c-muted);
+}
+
+/* ---- inline body images (illustrations, screenshots, placeholders) ----
+   Neither theme constrained these before: an <img> with no CSS renders
+   at native pixel size, which is routinely 2-4x wider than the content
+   column and bleeds off the page edge (found building a real book with
+   AI-generated illustrations). Cap to the column width and center. */
+article.content img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 14pt auto;
+}
+
+/* ---- illustrated cover (optional) ----
+   Set via YAML front matter: `cover-image: "/absolute/path/to/art.png"`.
+   The pandoc template sets the photo itself as a literal inline
+   `background-image: url(...)` (only when the field is present, so a
+   plain solid-color cover is byte-for-byte unchanged unless a book opts
+   in). The paper-tint overlay is a `::before` pseudo-element instead of
+   a second `background-image` layer: WeasyPrint fails to resolve a
+   `url()` reached through `var(--x)` substitution ("Relative URI
+   reference without a base URI: None", reproduced with an isolated
+   test file, both from an inline style and from an external
+   stylesheet) even when the path is absolute, so the two layers can't
+   share one `background-image` declaration the normal CSS way. Portrait
+   art close to the 600x900pt cover box (2:3) crops cleanest. See
+   references/themes.md for the image-generation recipe (style string,
+   aspect, gen-image invocation) that produced the reference cover this
+   was built and verified against. */
+.cover[style]::before {
+  content: "";
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+  background: linear-gradient(rgba(255, 255, 248, 0.32), rgba(255, 255, 248, 0.62) 55%, rgba(255, 255, 248, 0.92));
+}

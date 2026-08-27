@@ -1,0 +1,190 @@
+/* book-publisher design system — PDF (WeasyPrint paged media)
+   Reverse-engineered from a 2025 consulting-firm lead-magnet PDF.
+   Interior trim: US Letter 612x792pt. Cover trim: 600x900pt (custom).
+   Exact tokens documented in references/design-tokens.md. */
+
+:root {
+  /* Be Vietnam Pro (body/headings) + Fraunces (cover display type):
+     replaces the original Fira Sans / Times New Roman pair, neither of
+     which is Vietnamese-native. Verified by rendering real Vietnamese
+     text (combining tone marks, not just base Latin) through both
+     before switching — see references/themes.md for the render and
+     the general Vietnamese-diacritic gotcha this project keeps hitting.
+     Embedded via scripts/fetch_fonts.py -> fonts.css (auto-included by
+     build_book.py when present); these are the fallback stack for a
+     host where that hasn't been run, or fetching failed. */
+  --font-sans: "Be Vietnam Pro", "Fira Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Fraunces", "Times New Roman", "Liberation Serif", Georgia, serif;
+  --c-navy: #012169;
+  --c-green: #188038;
+  --c-ink: #1a1a1a;
+  --c-meta: #808080;
+  --c-cover-bg: #2a1642;
+  --c-cover-fg: #fffbf7;
+  --c-cover-accent: #c89e80;
+  --c-line: #d8d8d8;
+}
+
+* { box-sizing: border-box; }
+
+/* ---- page geometry ---- */
+/* Running-header/footer *content* (book title, footer CTA, page number) is
+   injected per-book by the pandoc template's inline <style>; this file only
+   sets geometry + shared margin-box typography so both merge on one @page. */
+@page {
+  size: letter;
+  margin: 54pt 54pt 54pt 162pt;   /* wide left rail is the signature layout trait */
+  @top-right   { font-family: var(--font-sans); font-size: 8pt; color: var(--c-meta); vertical-align: bottom; }
+  @bottom-left { font-family: var(--font-sans); font-size: 8pt; color: var(--c-meta); vertical-align: top; }
+  @bottom-right{ font-family: var(--font-sans); font-size: 8pt; color: var(--c-meta); vertical-align: top; }
+}
+
+@page cover {
+  size: 600pt 900pt;
+  margin: 0;
+  /* margin:0 alone doesn't stop the generic @page rule's running-header/
+     footer *content* (declared in template.pdf.html5's inline <style>,
+     which matches every page including this one) from painting past a
+     zero-size margin box — explicitly clear it here. Invisible on this
+     theme's dark cover (dark text matched the dark bg) until the tufte
+     theme's light cover exposed it — fixed in both. */
+  @top-right { content: none; }
+  @bottom-left { content: none; }
+  @bottom-right { content: none; }
+}
+
+body { font-family: var(--font-sans); color: var(--c-ink); font-size: 10.5pt; line-height: 1.55; }
+article.content { orphans: 3; widows: 3; }
+
+/* ---- heading system: h1=Part, h2=Chapter, h3=Section, h4=minor ----
+   Convention: every h2 MUST be immediately preceded by its h1 Part label
+   in the source markdown (repeat the h1 text for every chapter in that
+   part). Only h1 forces a page break — this avoids blank pages while
+   still starting every chapter on a fresh page. See content-model.md. */
+h1 {
+  page-break-before: always;
+  font-family: var(--font-sans); font-weight: 700; font-size: 13pt;
+  color: var(--c-navy); margin: 0 0 6pt 0;
+}
+h2 {
+  font-family: var(--font-sans); font-weight: 700; font-size: 22pt;
+  color: var(--c-green); margin: 0 0 14pt 0; line-height: 1.2;
+  page-break-after: avoid;
+}
+h3 {
+  font-family: var(--font-sans); font-weight: 700; font-size: 15pt;
+  color: var(--c-navy); margin: 22pt 0 8pt 0; page-break-after: avoid;
+}
+h4 {
+  font-family: var(--font-sans); font-weight: 700; font-size: 12pt;
+  color: var(--c-ink); margin: 16pt 0 6pt 0; page-break-after: avoid;
+}
+p { margin: 0 0 11pt 0; }
+strong { font-weight: 700; }
+a { color: var(--c-navy); text-decoration: underline; }
+
+/* ---- checklists: "- [ ] **Label:** text" (pandoc task_lists) ----
+   Hanging-indent via float, not flexbox: WeasyPrint's flex layout mis-
+   sizes the anonymous item that wraps "input + mixed inline text",
+   causing the label to wrap early and the description to jump beside
+   it instead of flowing after the colon. Float is simple and reliable. */
+ul.task-list { list-style: none; padding-left: 0; margin: 0 0 14pt 0; }
+ul.task-list li { margin-bottom: 8pt; page-break-inside: avoid; }
+ul.task-list label { display: block; overflow: hidden; }
+ul.task-list input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none;
+  float: left;
+  width: 10pt; height: 10pt; margin: 3pt 8pt 0 0;
+  border: 1.2pt solid var(--c-ink); background: white;
+}
+
+/* ---- full-page statement / promo block (fenced div `::: statement`) ---- */
+.statement {
+  page-break-before: always; page-break-after: always;
+  padding-top: 160pt;
+}
+.statement p {
+  font-family: var(--font-sans); font-weight: 700; font-size: 26pt;
+  line-height: 1.25; color: var(--c-ink); max-width: 380pt;
+}
+.statement p + p { font-weight: 400; font-size: 11pt; margin-top: 18pt; }
+
+/* ---- front matter (copyright page etc.) ---- */
+.frontmatter { font-size: 10pt; color: var(--c-ink); }
+.frontmatter p { margin: 0 0 10pt 0; }
+
+/* ---- table of contents (pandoc --toc output) ---- */
+#TOC { margin: 0 0 24pt 0; }
+#TOC > ul { list-style: none; padding-left: 0; margin: 0; }
+#TOC > ul > li { margin-top: 18pt; }
+#TOC a { text-decoration: none; color: inherit; }
+#TOC > ul > li > a { font-weight: 700; font-size: 13pt; color: var(--c-navy); }
+#TOC ul ul { list-style: none; padding-left: 0; margin: 4pt 0 0 0; }
+#TOC ul ul > li { margin-top: 4pt; }
+#TOC ul ul > li > a { font-weight: 700; font-size: 13pt; color: var(--c-navy); }
+#TOC ul ul ul { padding-left: 0; }
+#TOC ul ul ul > li { margin-top: 2pt; }
+#TOC ul ul ul > li > a { font-weight: 400; font-size: 10.5pt; color: var(--c-ink); }
+
+/* ---- cover (page 1 only, custom 600x900pt trim, full bleed) ---- */
+.cover {
+  page: cover;
+  position: relative;
+  width: 600pt; height: 900pt;
+  background: var(--c-cover-bg); color: var(--c-cover-fg);
+  padding: 90pt 60pt 60pt 60pt;
+}
+.cover-title {
+  page-break-before: avoid;
+  font-family: var(--font-serif); font-weight: 700; font-size: 64pt;
+  line-height: 1.12; color: var(--c-cover-fg); margin: 0;
+  position: relative; /* see the matching note in themes/tufte/pdf.css:
+    without this, the illustrated-cover ::before gradient (positioned)
+    paints over this text instead of behind it. */
+}
+.cover-subtitle {
+  font-family: var(--font-serif); font-weight: 400; font-size: 22pt;
+  color: var(--c-cover-accent); margin: 16pt 0 0 0; line-height: 1.3;
+  position: relative; /* see .cover-title */
+}
+.cover-logo {
+  /* fixed page box, so absolute positioning is more reliable here than
+     flex margin-top:auto (WeasyPrint's flex support is imperfect). */
+  position: absolute; left: 60pt; bottom: 60pt;
+  font-family: var(--font-sans); font-size: 13pt; letter-spacing: 1pt;
+  color: var(--c-cover-fg);
+}
+
+/* This theme has no margin rail for sidenotes (see the tufte theme).
+   Hide them cleanly instead of rendering broken inline checkboxes if a
+   tufte-authored manuscript is ever built with --theme boardroom. */
+.margin-toggle, .sidenote, .marginnote { display: none; }
+
+/* ---- inline body images (illustrations, screenshots, placeholders) ----
+   Same fix as the tufte theme: unconstrained <img> renders at native
+   pixel size and bleeds off the page. See tufte/pdf.css for the full
+   note (found building a real book, not a hypothetical). */
+article.content img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 14pt auto;
+}
+
+/* ---- illustrated cover (optional) ----
+   Set via YAML front matter: `cover-image: "/absolute/path/to/art.png"`.
+   Mirrors the tufte theme's mechanism, see its pdf.css for the full
+   note on why this is a `::before` overlay and not a second
+   `background-image` layer (WeasyPrint can't resolve a `url()` reached
+   through `var()` substitution). Tint here is a translucent version of
+   this theme's own --c-cover-bg (#2a1642 / rgb(42,22,66)) rather than
+   tufte's paper-white, so the cream cover text stays legible against
+   the same dark-plum mood instead of clashing with it. Verified by
+   rendering (see .cover-title/.cover-subtitle below for the matching
+   `position: relative` fix this needed — without it the gradient
+   painted over the text instead of behind it). */
+.cover[style]::before {
+  content: "";
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+  background: linear-gradient(rgba(42, 22, 66, 0.35), rgba(42, 22, 66, 0.65) 55%, rgba(42, 22, 66, 0.92));
+}

@@ -1,0 +1,73 @@
+/* book-publisher theme: jianghu — EPUB (reflowable)
+   Same tokens as pdf.css, minus fixed-page geometry, footnote-floating,
+   and the roman/Arabic page-counter split (all print-only concepts). */
+
+:root {
+  --font-serif: Georgia, "Times New Roman", "Liberation Serif", "Book Antiqua", serif;
+  --c-navy: #1d3358;
+  --c-gold: #a9834f;
+  --c-ink: #1a1a1a;
+  --c-muted: #6f6f6f;
+}
+
+body { font-family: var(--font-serif); color: var(--c-ink); line-height: 1.6; }
+
+p { margin: 0; text-indent: 1.4em; text-align: justify; }
+h1 + p, h2 + p, h3 + p, h4 + p,
+.frontmatter > p:first-child, .statement p:first-child { text-indent: 0; }
+
+h1 {
+  font-variant: small-caps; font-weight: 400; font-size: 0.85em;
+  letter-spacing: 0.06em; color: var(--c-muted);
+  text-align: center; margin: 0 0 0.3em 0; break-before: page;
+}
+h2 {
+  font-weight: 700; font-size: 1.5em; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--c-navy); text-align: center;
+  margin: 1.2em 0 0.9em 0;
+}
+h3 { font-style: italic; font-weight: 400; font-size: 1.15em; color: var(--c-ink); text-align: center; margin: 1.3em 0 0.5em 0; }
+h4 { font-style: italic; font-weight: 400; font-size: 1.05em; color: var(--c-ink); margin: 1em 0 0.4em 0; }
+a { color: var(--c-navy); }
+
+ul.task-list { list-style: none; padding-left: 0; }
+ul.task-list li { margin-bottom: 0.6em; }
+ul.task-list label { display: flex; align-items: flex-start; gap: 0.5em; }
+ul.task-list input[type="checkbox"] { margin-top: 0.2em; }
+
+.statement { text-align: center; }
+.statement p { font-style: italic; font-size: 1.2em; line-height: 1.5; text-indent: 0; }
+.statement p + p { font-style: normal; font-size: 0.9em; color: var(--c-muted); margin-top: 1em; }
+
+/* EPUB has no page-bottom concept, so a `float: footnote` note (print-
+   only) instead renders as a bracketed inline aside — still readable,
+   just not pulled to a page edge. */
+.footnote {
+  font-size: 0.85em; color: var(--c-muted); text-indent: 0;
+}
+.footnote::before { content: " [ "; }
+.footnote::after { content: " ] "; }
+
+.lesson-box {
+  margin: 1.6em 0 0.6em 0;
+  padding: 1em 1.2em;
+  border: 1px solid var(--c-gold);
+  border-left: 3px solid var(--c-gold);
+}
+.lesson-box p { text-indent: 0; margin: 0 0 0.6em 0; }
+.lesson-box p:last-child { margin-bottom: 0; }
+.lesson-box strong { color: var(--c-navy); }
+
+.frontmatter {
+  font-size: 0.9em; text-align: center;
+  border: 2px double var(--c-gold); padding: 1.4em 1.2em;
+}
+.frontmatter p { text-align: left; text-indent: 0; }
+
+nav#TOC { text-align: center; }
+nav#TOC ul { list-style: none; padding-left: 0; }
+nav#TOC ul ul { padding-left: 1em; }
+
+.margin-toggle, .sidenote, .marginnote { display: none; }
+
+img { display: block; max-width: 100%; height: auto; margin: 1em auto; }

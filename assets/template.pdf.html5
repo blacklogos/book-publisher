@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="$lang$">
+<head>
+<meta charset="utf-8">
+<title>$title$</title>
+<link rel="stylesheet" href="$pdf-css$">
+<style>
+/* Per-book running header/footer text. Geometry lives in the theme's
+   pdf.css (and facing-pages.css when --facing-pages is on); this block
+   only supplies the literal content (pandoc resolves $vars$ here). */
+$if(facing-pages)$
+/* Recto (odd/right) and verso (even/left) mirror which edge is "outer":
+   page number + CTA stay on the outer edge, brand moves to the inner
+   edge, instead of always sitting at a fixed left/right like the
+   single-sided default below. */
+@page :right {
+$if(running-title)$
+  @top-right { content: "$running-title$"; }
+$endif$
+$if(footer-brand)$
+  @bottom-left { content: "$footer-brand$"; }
+$endif$
+$if(footer-cta)$
+  @bottom-right { content: "$footer-cta$" counter(page); }
+$else$
+  @bottom-right { content: counter(page); }
+$endif$
+}
+@page :left {
+$if(running-title)$
+  @top-left { content: "$running-title$"; }
+$endif$
+$if(footer-brand)$
+  @bottom-right { content: "$footer-brand$"; }
+$endif$
+$if(footer-cta)$
+  @bottom-left { content: "$footer-cta$" counter(page); }
+$else$
+  @bottom-left { content: counter(page); }
+$endif$
+}
+$else$
+@page {
+$if(running-title)$
+  @top-right { content: "$running-title$"; }
+$endif$
+$if(footer-brand)$
+  @bottom-left { content: "$footer-brand$"; }
+$endif$
+$if(footer-cta)$
+  @bottom-right { content: "$footer-cta$" counter(page); }
+$else$
+  @bottom-right { content: counter(page); }
+$endif$
+}
+$endif$
+</style>
+$for(css)$
+<link rel="stylesheet" href="$css$">
+$endfor$
+</head>
+<body>
+
+<section class="cover"$if(cover-image)$ style="background-image: url('$cover-image$'); background-size: cover; background-position: center; background-repeat: no-repeat;"$endif$>
+  <h1 class="cover-title">$title$</h1>
+$if(subtitle)$
+  <p class="cover-subtitle">$subtitle$</p>
+$endif$
+$if(publisher-name)$
+  <div class="cover-logo">$publisher-name$</div>
+$endif$
+</section>
+
+$if(copyright)$
+<section class="frontmatter">
+$copyright$
+</section>
+$endif$
+
+$if(promo)$
+<section class="statement">
+$promo$
+</section>
+$endif$
+
+<article class="content">
+$if(toc)$
+<nav id="TOC" role="doc-toc">
+$table-of-contents$
+</nav>
+$endif$
+$body$
+</article>
+
+</body>
+</html>

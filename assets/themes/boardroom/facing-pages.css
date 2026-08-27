@@ -1,0 +1,23 @@
+/* book-publisher theme: boardroom — facing-pages overlay (opt-in via
+   scripts/build_book.py --facing-pages). Loaded after pdf.css and after
+   the running-header/footer <style> block in template.pdf.html5, whose
+   $if(facing-pages)$ branch already emits matching @page :left/:right
+   *content* rules — this file only adds the *geometry* mirroring, so
+   the two combine rather than conflict.
+
+   The default single-sided layout (pdf.css) puts the wide rail on the
+   left of every page. For a double-sided printed/bound book, the wide
+   rail should sit on the *outer* edge of each page instead, so that a
+   spread (two facing pages) reads as a mirrored, balanced pair instead
+   of both pages jamming their content toward the same physical side. */
+
+@page :right {
+  /* recto (odd): outer edge = right, so the wide rail moves there */
+  margin: 54pt 162pt 54pt 54pt;
+}
+/* :left (verso/even) needs no override — it already matches pdf.css's
+   single-sided default (wide rail on the left = outer edge for verso). */
+
+/* Professional print convention: chapters start on a recto page, with
+   a blank verso inserted if needed. Overrides pdf.css's h1{always}. */
+h1 { page-break-before: right; }

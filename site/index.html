@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Publisher: Turn Markdown into designed PDF and EPUB books</title>
+  <meta name="description" content="Builds designed PDF and EPUB books from one Markdown file. Three real themes, cover pages, sidenotes, print-ready pagination. An agent skill, free and offline.">
+  <meta name="keywords" content="book publisher skill, markdown to pdf book, markdown to epub, ebook generator, lead magnet pdf, agent skill, claude code skill, pandoc weasyprint book, book from markdown">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="Book Publisher">
+  <meta name="theme-color" content="#fffff8">
+  <link rel="canonical" href="https://bookpublisher.cc4.marketing/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://bookpublisher.cc4.marketing/">
+  <meta property="og:title" content="Book Publisher: Turn Markdown into designed PDF and EPUB books">
+  <meta property="og:description" content="One Markdown file in, a designed book out. Cover, TOC, sidenotes, three themes, print-ready pagination. Runs offline with your AI agent.">
+  <meta property="og:site_name" content="Book Publisher">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://bookpublisher.cc4.marketing/">
+  <meta name="twitter:title" content="Book Publisher: Turn Markdown into designed PDF and EPUB books">
+  <meta name="twitter:description" content="Write Markdown, get a designed book. Three themes, real pagination, EPUB included. Free, offline, agent-native.">
+
+  <!-- Structured Data: SoftwareApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Book Publisher",
+    "applicationCategory": "DesktopApplication",
+    "operatingSystem": "macOS, Linux",
+    "url": "https://bookpublisher.cc4.marketing/",
+    "description": "Builds designed PDF and EPUB books from one Markdown file. Three real themes, cover pages, sidenotes, print-ready pagination. An agent skill, free and offline.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "softwareVersion": "0.1.0",
+    "codeRepository": "https://github.com/blacklogos/book-publisher",
+    "featureList": [
+      "One Markdown manuscript builds both PDF and EPUB",
+      "Three swappable themes derived from real reference designs",
+      "Cover page, TOC, roman-numeral front matter, running headers",
+      "Checklists, definition boxes, sidenotes, and real footnotes",
+      "Facing-pages mode with mirrored margins for duplex print",
+      "Automatic preview PNGs of rendered pages for QA",
+      "Works with Claude Code, Codex, and any agent that reads skill folders"
+    ]
+  }
+  </script>
+
+  <!-- Structured Data: FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What does Book Publisher do?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Book Publisher is an agent skill that turns a single Markdown manuscript into a designed PDF and EPUB book. It produces a full-bleed cover, table of contents, part and chapter openers, page numbers, running headers, sidenotes, and checklists, all from plain Markdown headings and front matter." }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I install Book Publisher for Claude Code?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Unzip the package and copy the book-publisher folder into your skills directory: cp -R book-publisher ~/.claude/skills/ for all projects, or into your-repo/.claude/skills/ for one project. Open a new Claude session and ask for a book; the skill activates automatically." }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I use Book Publisher with an AI agent?",
+        "acceptedAnswer": { "@type": "Answer", "text": "After installing, just describe the book you want in plain language, for example 'Turn my notes into a lead magnet PDF' or 'Write a 5-chapter guide to sourdough and build it as a book'. The agent reads the skill, writes or adapts the manuscript, builds the PDF and EPUB, and inspects rendered preview images before handing it over. No commands needed from you." }
+      },
+      {
+        "@type": "Question",
+        "name": "What themes are included in Book Publisher?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Book Publisher ships three themes: boardroom, a corporate lead-magnet look with colored headings and a full-bleed cover; tufte, a monochrome academic style with margin sidenotes adapted from Tufte CSS; and jianghu, a translated-novel look with digest trim, centered chapter openers, and real bottom-of-page footnotes. Switching themes is one flag and never requires manuscript changes." }
+      },
+      {
+        "@type": "Question",
+        "name": "Do I need to know CSS or book design to use Book Publisher?",
+        "acceptedAnswer": { "@type": "Answer", "text": "No. Book Publisher encodes the design decisions: where chapters break, how the table of contents nests, how front matter is numbered. You write ordinary Markdown headings and the themes handle typography and pagination. Design tokens are exposed as CSS custom properties only if you want to customize." }
+      },
+      {
+        "@type": "Question",
+        "name": "What dependencies does Book Publisher need?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Book Publisher needs two tools: pandoc for Markdown conversion and weasyprint for print-quality PDF rendering. The included check_deps.py script detects your OS and prints the exact install commands, for example brew install pandoc and uv tool install weasyprint on macOS. Everything else is Python standard library." }
+      },
+      {
+        "@type": "Question",
+        "name": "Can Book Publisher make print-ready books for double-sided printing?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Add the --facing-pages flag and margins mirror between left and right pages, running headers alternate, and every chapter opens on a right-hand page, inserting a blank left page when needed, the way bound books do. Without the flag you get single-sided output ideal for screen reading." }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I create my own theme from a design I like?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Book Publisher documents the exact process used to build its three themes: fetch the reference PDF or web page, sample the real colors, read the real fonts and CSS, then translate to print CSS. Hand your agent the reference and say 'make a theme from this'; the guide in references/themes.md covers the known pitfalls." }
+      },
+      {
+        "@type": "Question",
+        "name": "What Markdown conventions does the manuscript use?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Simple ones: a level-1 heading is a Part, level-2 is a Chapter, level-3 is a Section. YAML front matter at the top sets title, subtitle, author, and publisher. Checklists, definition boxes, and sidenotes use ordinary Markdown syntax, and a working example manuscript demonstrating every pattern is bundled to copy from." }
+      },
+      {
+        "@type": "Question",
+        "name": "Does Book Publisher send my manuscript anywhere?",
+        "acceptedAnswer": { "@type": "Answer", "text": "No. Book Publisher runs entirely on your machine. Pandoc and WeasyPrint are local tools, the build script is offline Python, and your manuscript never leaves your computer. There is no server, no account, and no telemetry." }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* Tufte tokens, lifted from the skill's tufte theme pdf.css */
+    :root {
+      --paper: #fffff8;
+      --ink: #111111;
+      --muted: #666666;
+      --rule: #cccccc;
+      --faint: #f5f5ee;
+      --radius: 2px;
+      --font-serif: Georgia, "Palatino Linotype", "Times New Roman", "Book Antiqua", Palatino, serif;
+      --font-sans: "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
+      --font-mono: Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    body {
+      font-family: var(--font-serif);
+      color: var(--ink);
+      background: var(--paper);
+      min-height: 100vh;
+      line-height: 1.65;
+      font-size: 17px;
+    }
+
+    .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+    .smallcaps {
+      font-variant: small-caps;
+      letter-spacing: 0.08em;
+      text-transform: lowercase;
+    }
+
+    /* ── Header: flat, rule-separated, no pill ── */
+    header { padding: 26px 0 0; }
+    .header-inner {
+      display: flex; align-items: baseline; justify-content: space-between;
+      border-bottom: 1px solid var(--ink);
+      padding-bottom: 14px;
+    }
+    .header-left { display: flex; align-items: baseline; gap: 14px; }
+    .logo { font-family: var(--font-serif); font-size: 22px; font-style: italic; color: var(--ink); text-decoration: none; }
+    .badge {
+      font-family: var(--font-serif); font-variant: small-caps; text-transform: lowercase;
+      letter-spacing: 0.1em; font-size: 14px; color: var(--muted);
+    }
+    .header-right { display: flex; align-items: baseline; gap: 20px; }
+    .header-link {
+      font-size: 15px; color: var(--muted); text-decoration: none;
+      font-variant: small-caps; text-transform: lowercase; letter-spacing: 0.06em;
+      transition: color 0.2s;
+    }
+    .header-link:hover { color: var(--ink); }
+    .gh-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--ink); color: var(--paper);
+      font-family: var(--font-serif); font-size: 14px;
+      font-variant: small-caps; text-transform: lowercase; letter-spacing: 0.08em;
+      padding: 6px 16px; border-radius: var(--radius); text-decoration: none;
+      transition: background 0.2s;
+    }
+    .gh-btn:hover { background: #333; }
+
+    /* ── Hero ── */
+    .hero { padding: 72px 0 48px; display: grid; grid-template-columns: 1.05fr 1fr; gap: 56px; align-items: center; }
+    .hero-text h1 {
+      font-family: var(--font-serif); font-weight: 400;
+      font-size: clamp(34px, 4.6vw, 52px); line-height: 1.12; margin-bottom: 18px;
+    }
+    .hero-text h1 span { font-style: italic; }
+    .hero-text .tagline { font-size: 17px; color: var(--muted); margin-bottom: 30px; max-width: 460px; }
+    .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .btn-primary, .btn-dark, .btn-secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-serif); font-size: 15px;
+      font-variant: small-caps; text-transform: lowercase; letter-spacing: 0.08em;
+      padding: 10px 22px; border-radius: var(--radius);
+      text-decoration: none; cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-primary { background: var(--ink); color: var(--paper); border: 1px solid var(--ink); }
+    .btn-primary:hover { background: #333; }
+    .btn-dark, .btn-secondary { background: transparent; color: var(--ink); border: 1px solid var(--ink); }
+    .btn-dark:hover, .btn-secondary:hover { background: var(--faint); }
+
+    .hero-visual { position: relative; }
+    .hero-visual .screenshot {
+      width: 100%;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      background: var(--paper);
+    }
+    .hero-visual .screenshot-glow { display: none; }
+
+    /* ── Install card: hairline box, light code block ── */
+    .install-section { padding: 32px 0 48px; }
+    .install-card {
+      border: 1px solid var(--ink); border-radius: var(--radius);
+      padding: 30px 32px; max-width: 640px; margin: 0 auto; text-align: center;
+    }
+    .install-card .label {
+      font-family: var(--font-serif); font-variant: small-caps; text-transform: lowercase;
+      letter-spacing: 0.12em; font-size: 15px; color: var(--muted); margin-bottom: 14px;
+    }
+    .install-code {
+      position: relative; background: var(--faint);
+      border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 14px 92px 14px 18px; text-align: left;
+    }
+    .install-code code { font-family: var(--font-mono); font-size: 13.5px; color: var(--ink); word-break: break-all; }
+    .install-code code .prompt { color: var(--muted); }
+    .install-note { font-size: 14px; color: var(--muted); margin-top: 14px; font-style: italic; }
+    .install-note code { font-family: var(--font-mono); font-size: 12.5px; font-style: normal; }
+    .copy-btn {
+      position: absolute; top: 50%; right: 10px; transform: translateY(-50%);
+      background: var(--paper); border: 1px solid var(--ink);
+      color: var(--ink); font-family: var(--font-serif); font-size: 13px;
+      font-variant: small-caps; text-transform: lowercase; letter-spacing: 0.06em;
+      padding: 4px 12px; border-radius: var(--radius); cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .copy-btn:hover { background: var(--ink); color: var(--paper); }
+    .copy-btn.copied { background: var(--ink); color: var(--paper); }
+
+    /* ── Section headings: rule above, italic sub ── */
+    .section-heading { text-align: left; margin-bottom: 40px; border-top: 1px solid var(--ink); padding-top: 28px; }
+    .section-heading h2 { font-family: var(--font-serif); font-weight: 400; font-size: clamp(26px, 3.6vw, 36px); margin-bottom: 8px; }
+    .section-heading p { color: var(--muted); font-size: 16px; font-style: italic; max-width: 560px; }
+
+    /* ── Features: flat entries with top rules, no cards ── */
+    .features { padding: 48px 0 56px; }
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px 40px; }
+    .feature-card { border-top: 1px solid var(--rule); padding-top: 16px; }
+    .feature-num {
+      font-family: var(--font-serif); font-style: italic;
+      font-size: 17px; color: var(--muted); margin-bottom: 8px;
+    }
+    .feature-card h3 { font-family: var(--font-serif); font-weight: 700; font-size: 18px; margin-bottom: 6px; }
+    .feature-card p { font-size: 15px; color: var(--muted); line-height: 1.6; }
+
+    /* ── How It Works ── */
+    .how-it-works { padding: 48px 0 56px; }
+    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+    .step { text-align: left; position: relative; }
+    .step-num {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: transparent; color: var(--ink); border: 1px solid var(--ink);
+      font-family: var(--font-serif); font-size: 18px;
+      display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px;
+    }
+    .step h3 { font-family: var(--font-serif); font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+    .step p { font-size: 14.5px; color: var(--muted); line-height: 1.55; }
+    .step:not(:last-child)::after { display: none; }
+
+    /* ── Tech stack: single rule row ── */
+    .tech { padding: 24px 0 56px; }
+    .tech-inner {
+      border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+      padding: 22px 0;
+      display: flex; align-items: baseline; justify-content: space-between; gap: 24px; flex-wrap: wrap;
+    }
+    .tech-item { text-align: center; }
+    .tech-item .tech-label {
+      font-variant: small-caps; text-transform: lowercase; letter-spacing: 0.12em;
+      font-size: 13px; color: var(--muted); margin-bottom: 2px;
+    }
+    .tech-item .tech-name { font-family: var(--font-serif); font-style: italic; font-size: 17px; }
+
+    /* ── FAQ ── */
+    .faq { padding: 48px 0 64px; }
+    .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 56px; }
+    .faq-item { border-bottom: 1px solid var(--rule); }
+    .faq-q {
+      all: unset; box-sizing: border-box;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      width: 100%; padding: 16px 0;
+      font-family: var(--font-serif); font-size: 16.5px; font-weight: 700;
+      color: var(--ink); cursor: pointer; line-height: 1.4;
+    }
+    .faq-q:hover { color: var(--muted); }
+    .faq-icon {
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 1px solid var(--ink); background: transparent;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      transition: background .2s;
+    }
+    .faq-icon svg { width: 10px; height: 10px; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; fill: none; transition: transform .2s, stroke .2s; }
+    .faq-item.open .faq-icon { background: var(--ink); }
+    .faq-item.open .faq-icon svg { stroke: var(--paper); transform: rotate(45deg); }
+    .faq-a { font-size: 15px; color: var(--muted); line-height: 1.7; max-height: 0; overflow: hidden; transition: max-height .3s ease; }
+    .faq-a p { padding-bottom: 16px; }
+    .faq-a code { font-family: var(--font-mono); font-size: 13px; }
+    .faq-item.open .faq-a { max-height: 340px; }
+
+    /* ── Footer ── */
+    footer { padding: 28px 0 44px; border-top: 1px solid var(--ink); }
+    .footer-inner { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 12px; }
+    .footer-inner span, .footer-inner a {
+      font-family: var(--font-serif); font-variant: small-caps; text-transform: lowercase;
+      letter-spacing: 0.08em; font-size: 14px; color: var(--muted); text-decoration: none;
+    }
+    .footer-inner a:hover { color: var(--ink); }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .hero { grid-template-columns: 1fr; padding: 44px 0 32px; gap: 36px; }
+      .hero-text { text-align: left; }
+      .features-grid { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: 1fr 1fr; gap: 28px; }
+      .header-link { display: none; }
+      .faq-grid { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; }
+      .tech-inner { justify-content: center; gap: 20px 32px; }
+    }
+    @media (max-width: 480px) { .steps { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="container">
+    <header>
+      <div class="header-inner">
+        <div class="header-left">
+          <a href="#" class="logo">Book Publisher</a>
+          <span class="badge">Agent Skill</span>
+        </div>
+        <div class="header-right">
+          <a href="#features" class="header-link">Features</a>
+          <a href="#how" class="header-link">How it works</a>
+          <a href="#install" class="header-link">Install</a>
+          <a href="#faq" class="header-link">FAQ</a>
+          <a href="https://github.com/blacklogos/book-publisher/releases/latest/download/book-publisher.zip" class="gh-btn" download>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Get the Zip
+          </a>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <!-- Hero -->
+  <div class="container">
+    <section class="hero">
+      <div class="hero-text">
+        <h1>Markdown in.<br>A <span>designed book</span> out.</h1>
+        <p class="tagline">An agent skill that turns one .md file into a PDF and EPUB with a real cover, real pagination, and three swappable themes. Tell your agent what book you want; review a finished PDF.</p>
+        <div class="hero-ctas">
+          <a href="https://github.com/blacklogos/book-publisher/releases/latest/download/book-publisher.zip" class="btn-primary" download>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download the Skill
+          </a>
+          <a href="#how" class="btn-dark">See how it works</a>
+          <a href="#faq" class="btn-secondary">Questions</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="screenshot-glow"></div>
+        <!-- Manuscript-to-book mockup: md file on the left, purple cover + inner page on the right -->
+        <svg class="screenshot" viewBox="0 0 560 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A Markdown file turning into a designed book cover and page">
+          <rect width="560" height="400" fill="#fff" rx="16"/>
+          <!-- left: markdown editor card -->
+          <rect x="28" y="46" width="216" height="308" rx="10" fill="#faf8f4" stroke="#e5e0d6"/>
+          <rect x="28" y="46" width="216" height="34" rx="10" fill="#f0ece3"/>
+          <circle cx="46" cy="63" r="4" fill="#e0574f"/><circle cx="60" cy="63" r="4" fill="#e8b93e"/><circle cx="74" cy="63" r="4" fill="#5fb56b"/>
+          <text x="96" y="67" font-family="Menlo, monospace" font-size="10" fill="#8a8578">manuscript.md</text>
+          <text x="44" y="104" font-family="Menlo, monospace" font-size="10" fill="#666666">---</text>
+          <text x="44" y="120" font-family="Menlo, monospace" font-size="10" fill="#3a3a3a">title: Field Notes</text>
+          <text x="44" y="136" font-family="Menlo, monospace" font-size="10" fill="#3a3a3a">author: You</text>
+          <text x="44" y="152" font-family="Menlo, monospace" font-size="10" fill="#666666">---</text>
+          <text x="44" y="176" font-family="Menlo, monospace" font-size="10" fill="#666666"># Part One</text>
+          <text x="44" y="196" font-family="Menlo, monospace" font-size="10" fill="#111111">## Chapter 1</text>
+          <rect x="44" y="208" width="170" height="5" rx="2.5" fill="#ddd6c9"/>
+          <rect x="44" y="220" width="184" height="5" rx="2.5" fill="#ddd6c9"/>
+          <rect x="44" y="232" width="150" height="5" rx="2.5" fill="#ddd6c9"/>
+          <text x="44" y="258" font-family="Menlo, monospace" font-size="10" fill="#111111">## Chapter 2</text>
+          <rect x="44" y="270" width="178" height="5" rx="2.5" fill="#ddd6c9"/>
+          <rect x="44" y="282" width="160" height="5" rx="2.5" fill="#ddd6c9"/>
+          <text x="44" y="308" font-family="Menlo, monospace" font-size="10" fill="#3a3a3a">- [ ] checklist</text>
+          <rect x="44" y="320" width="140" height="5" rx="2.5" fill="#ddd6c9"/>
+          <!-- arrow -->
+          <g stroke="#111111" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M258 200 h34"/><path d="M285 191 l9 9 -9 9"/>
+          </g>
+          <!-- right: book cover, tufte-style restrained paper cover -->
+          <g>
+            <rect x="312" y="58" width="150" height="216" rx="2" fill="#fffff8" stroke="#111111"/>
+            <rect x="312" y="58" width="6" height="216" fill="#e9e9df"/>
+            <text x="338" y="120" font-family="Georgia, serif" font-size="24" fill="#111111">Field</text>
+            <text x="338" y="148" font-family="Georgia, serif" font-size="24" fill="#111111">Notes</text>
+            <rect x="338" y="162" width="44" height="1.5" fill="#111111"/>
+            <text x="338" y="184" font-family="Georgia, serif" font-style="italic" font-size="11" fill="#666666">A working guide</text>
+            <text x="338" y="256" font-family="Georgia, serif" font-size="9" letter-spacing="1.5" fill="#666666">YOUR PRESS</text>
+          </g>
+          <!-- right: inner page peeking behind -->
+          <g>
+            <rect x="404" y="96" width="132" height="216" rx="6" fill="#fdfcf9" stroke="#e5e0d6"/>
+            <text x="422" y="130" font-family="Georgia, serif" font-size="13" font-weight="700" fill="#141414">Chapter 1</text>
+            <rect x="422" y="142" width="96" height="4" rx="2" fill="#e2ddd2"/>
+            <rect x="422" y="152" width="100" height="4" rx="2" fill="#e2ddd2"/>
+            <rect x="422" y="162" width="88" height="4" rx="2" fill="#e2ddd2"/>
+            <rect x="422" y="180" width="100" height="4" rx="2" fill="#e2ddd2"/>
+            <rect x="422" y="190" width="92" height="4" rx="2" fill="#e2ddd2"/>
+            <!-- sidenote rail -->
+            <rect x="422" y="208" width="60" height="30" rx="4" fill="#f5f5ee"/>
+            <rect x="428" y="215" width="46" height="3" rx="1.5" fill="#bbbbbb"/>
+            <rect x="428" y="223" width="38" height="3" rx="1.5" fill="#bbbbbb"/>
+            <rect x="422" y="252" width="100" height="4" rx="2" fill="#e2ddd2"/>
+            <rect x="422" y="262" width="84" height="4" rx="2" fill="#e2ddd2"/>
+            <text x="462" y="298" font-family="Georgia, serif" font-size="9" fill="#8a8578">3</text>
+          </g>
+          <!-- caption chips -->
+          <rect x="312" y="330" width="70" height="22" rx="11" fill="#f5f5ee"/>
+          <text x="327" y="345" font-family="Menlo, monospace" font-size="10" fill="#111111">.pdf</text>
+          <rect x="392" y="330" width="76" height="22" rx="11" fill="#f5f5ee"/>
+          <text x="406" y="345" font-family="Menlo, monospace" font-size="10" fill="#111111">.epub</text>
+        </svg>
+      </div>
+    </section>
+  </div>
+
+  <!-- Install -->
+  <div class="container">
+    <section class="install-section" id="install">
+      <div class="install-card">
+        <div class="label">Install in 30 seconds</div>
+        <div class="install-code">
+          <code><span class="prompt">$</span> cp -R book-publisher ~/.claude/skills/</code>
+          <button class="copy-btn" data-copy="cp -R book-publisher ~/.claude/skills/">Copy</button>
+        </div>
+        <p class="install-note">Unzip first, then run this. Open a new agent session and say "build me an ebook". Run <code>scripts/check_deps.py</code> once for pandoc + weasyprint install commands.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- Features -->
+  <div class="container">
+    <section class="features" id="features">
+      <div class="section-heading">
+        <h2>Everything a book needs, from plain Markdown</h2>
+        <p>The design decisions are encoded in the skill, so your agent gets them right the first time.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-num">01</div>
+          <h3>Real book structure</h3>
+          <p># is a Part, ## is a Chapter, ### is a Section. Front matter sets title and author. You get a cover, TOC, roman-numeral front matter that restarts at Chapter 1, and running headers.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-num">02</div>
+          <h3>Three real themes</h3>
+          <p>boardroom for lead magnets, tufte for academic essays with margin sidenotes, jianghu for novels with true footnotes. Each reproduces a reference design, not a generic default.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-num">03</div>
+          <h3>One flag to reskin</h3>
+          <p>Switch themes with --theme tufte. The manuscript never changes. Build all three from the same file and pick your favorite.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-num">04</div>
+          <h3>Rich blocks, still Markdown</h3>
+          <p>Checklists render as designed check boxes. Definition boxes highlight key terms. Sidenotes sit in the margin or become bottom-of-page footnotes, theme depending.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-num">05</div>
+          <h3>Print-ready duplex mode</h3>
+          <p>--facing-pages mirrors margins between left and right pages and opens every chapter on a right-hand page, the way bound books do.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-num">06</div>
+          <h3>Built-in QA previews</h3>
+          <p>Every build renders the first pages to PNG. Overflow, bad breaks, and cover bleed only show up rendered, so the skill makes your agent look before shipping.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- How It Works -->
+  <div class="container">
+    <section class="how-it-works" id="how">
+      <div class="section-heading">
+        <h2>How it works with your agent</h2>
+        <p>You talk. The agent writes, builds, inspects, and fixes. You review a finished PDF.</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <h3>Drop it in</h3>
+          <p>Copy the folder into ~/.claude/skills/ or any agent's skill directory.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <h3>Ask for a book</h3>
+          <p>"Turn my notes into a lead magnet PDF." The skill activates on its own.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <h3>Agent builds</h3>
+          <p>It writes the manuscript, runs the build, and checks the preview pages.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <h3>You ship</h3>
+          <p>A designed PDF and EPUB land in your output folder, ready to send.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Tech Stack -->
+  <div class="container">
+    <section class="tech">
+      <div class="tech-inner">
+        <div class="tech-item"><div class="tech-label">Convert</div><div class="tech-name">Pandoc</div></div>
+        <div class="tech-item"><div class="tech-label">Render</div><div class="tech-name">WeasyPrint</div></div>
+        <div class="tech-item"><div class="tech-label">Glue</div><div class="tech-name">Python stdlib</div></div>
+        <div class="tech-item"><div class="tech-label">Design</div><div class="tech-name">CSS Paged Media</div></div>
+        <div class="tech-item"><div class="tech-label">Source</div><div class="tech-name">Markdown</div></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- FAQ -->
+  <div class="container">
+    <section class="faq" id="faq">
+      <div class="section-heading">
+        <h2>Frequently Asked Questions</h2>
+        <p>Everything you need to know about Book Publisher.</p>
+      </div>
+      <div class="faq-grid">
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">What does Book Publisher do?<span class="faq-icon"><svg viewBox="0 0 10 10"><path d="M5 1v8M1 5h8"/></svg></span></button>
+          <div class="faq-a"><p>Book Publisher is an agent skill that turns a single Markdown manuscript into a designed PDF and EPUB book: full-bleed cover, table of contents, part and chapter openers, page numbers, running headers, sidenotes, and checklists, all from plain headings and front matter.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">How do I install it for Claude Code?<span class="faq-icon"><svg viewBox="0 0 10 10"><path d="M5 1v8M1 5h8"/></svg></span></button>
+          <div class="faq-a"><p>Unzip the package and run <code>cp -R book-publisher ~/.claude/skills/</code> for all projects, or copy into <code>your-repo/.claude/skills/</code> for one project. Open a new session and ask for a book; the skill activates automatically.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">How do I use it with an AI agent?<span class="faq-icon"><svg viewBox="0 0 10 10"><path d="M5 1v8M1 5h8"/></svg></span></button>
+          <div class="faq-a"><p>Just describe the book: "Write a 5-chapter beginner's guide to sourdough and build it as a book." The agent reads the skill, writes the manuscript, builds both formats, and inspects rendered previews before handing over. No commands needed from you.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">What themes are included?<span class="faq-icon"><svg viewBox="0 0 10 10"><path d="M5 1v8M1 5h8"/></svg></span></button>
+          <div class="faq-a"><p>Three: boardroom, a corporate lead-magnet look with a full-bleed cover; tufte, monochrome academic style with margin sidenotes; jianghu, a translated-novel look with digest trim and real footnotes. Switching is one flag, no manuscript changes.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">Do I need to know CSS or book design?<span class="faq-icon"><svg viewBox="0 0 10 10"><path d="M5 1v8M1 5h8"/></svg></span></button>
+          <div class="faq-a"><p>No. The skill encodes the design decisions: chapter breaks, TOC nesting, front-matter numbering. You write ordinary Markdown. Design tokens are exposed as CSS custom properties only if you want to customize.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">What dependencies does it need?<span class="faq-icon"><svg viewBox="0 0 10 10"><path d="M5 1v8M1 5h8"/></svg></span></button>
+          <div class="faq-a"><p>Two tools: pandoc and weasyprint. The bundled <code>check_deps.py</code> detects your OS and prints exact install commands (on macOS: <code>brew install pandoc</code>, <code>uv tool install weasyprint</code>). Everything else is Python standard library.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">Can it make print-ready duplex books?<span class="faq-icon"><svg viewBox="0 0 10 10"><path d="M5 1v8M1 5h8"/></svg></span></button>
+          <div class="faq-a"><p>Yes. Add <code>--facing-pages</code> and margins mirror between left and right pages, and every chapter opens on a right-hand page, inserting a blank left page when needed. Without the flag you get screen-reading output.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">Can I make my own theme from a design I like?<span class="faq-icon"><svg viewBox="0 0 10 10"><path d="M5 1v8M1 5h8"/></svg></span></button>
+          <div class="faq-a"><p>Yes. Hand your agent the reference PDF or page and say "make a theme from this". The skill documents the process used for its own themes: sample real colors, read real fonts, translate to print CSS, plus the known pitfalls.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">What Markdown conventions does it use?<span class="faq-icon"><svg viewBox="0 0 10 10"><path d="M5 1v8M1 5h8"/></svg></span></button>
+          <div class="faq-a"><p>Level-1 heading is a Part, level-2 a Chapter, level-3 a Section. YAML front matter sets title, subtitle, author, publisher. A working example manuscript demonstrating every pattern is bundled to copy from.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">Does it send my manuscript anywhere?<span class="faq-icon"><svg viewBox="0 0 10 10"><path d="M5 1v8M1 5h8"/></svg></span></button>
+          <div class="faq-a"><p>No. Book Publisher runs entirely on your machine. Pandoc and WeasyPrint are local tools, the build script is offline Python, and your manuscript never leaves your computer. No server, no account, no telemetry.</p></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Footer -->
+  <div class="container">
+    <footer>
+      <div class="footer-inner">
+        <span>Book Publisher, an agent skill</span>
+        <span><a href="https://github.com/blacklogos/book-publisher/releases/latest/download/book-publisher.zip" download>Download</a> · <a href="https://github.com/blacklogos/book-publisher">GitHub</a> · <a href="#faq">FAQ</a></span>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Copy-to-clipboard with "Copied" feedback
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        navigator.clipboard.writeText(btn.dataset.copy).then(() => {
+          btn.textContent = 'Copied';
+          btn.classList.add('copied');
+          setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1600);
+        });
+      });
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+      });
+    });
+
+    // FAQ accordion: single-open
+    document.querySelectorAll('.faq-q').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.closest('.faq-item');
+        const isOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-item.open').forEach(el => {
+          el.classList.remove('open');
+          el.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
+        });
+        if (!isOpen) { item.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+/* book-publisher theme: jianghu — facing-pages overlay (opt-in via
+   scripts/build_book.py --facing-pages). Loaded after pdf.css and after
+   the running-header/footer <style> block in template.pdf.html5, whose
+   $if(facing-pages)$ branch already emits matching @page :left/:right
+   *content* rules — this file only adds geometry.
+
+   jianghu has no wide margin rail to relocate (unlike boardroom): the only
+   real print-binding concern here is gutter clearance, so the inner
+   (spine-side) margin gets a little extra room on both recto and verso
+   while the outer margin stays put. Chapters start on a recto page, the
+   standard print convention, overriding pdf.css's h1{always}. */
+
+@page :right {
+  margin: 54pt 48pt 60pt 60pt;  /* inner (left, spine side) +12pt */
+}
+@page :left {
+  margin: 54pt 60pt 60pt 48pt;  /* inner (right, spine side) +12pt */
+}
+
+h1 { page-break-before: right; }
+
+/* Known limitation, not a silent bug: pdf.css's `frontmatter`/`mainmatter`
+   named pages (used for roman-numeral front matter and the Arabic-reset
+   first chapter — see pdf.css) set their own unconditional `margin`, and
+   a named `@page` rule wins over an unqualified `:right`/`:left` one in
+   the page-selector cascade. Those specific pages render with jianghu's
+   normal single-sided margins even under --facing-pages; every other
+   page mirrors correctly. Matches the tufte theme's own documented
+   sidenote-rail limitation under facing pages — a real CSS Paged Media
+   constraint, not something worth a workaround for an opt-in, print-only
+   flag most books built with this skill never use. */

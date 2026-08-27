@@ -1,0 +1,46 @@
+/* book-publisher design system — EPUB (reflowable)
+   Same color/type tokens as pdf.css, minus fixed-page geometry. */
+
+:root {
+  /* see the matching note in themes/boardroom/pdf.css */
+  --font-sans: "Be Vietnam Pro", "Fira Sans", "Helvetica Neue", Arial, sans-serif;
+  --c-navy: #012169;
+  --c-green: #188038;
+  --c-ink: #1a1a1a;
+}
+
+body { font-family: var(--font-sans); color: var(--c-ink); line-height: 1.5; }
+
+h1 {
+  color: var(--c-navy); font-weight: 700; font-size: 1.1em;
+  margin: 0 0 0.3em 0; break-before: page;
+}
+h2 {
+  color: var(--c-green); font-weight: 700; font-size: 1.6em;
+  margin: 0 0 0.6em 0;
+}
+h3 { color: var(--c-navy); font-weight: 700; font-size: 1.2em; margin: 1.4em 0 0.5em 0; }
+h4 { color: var(--c-ink); font-weight: 700; font-size: 1.05em; margin: 1.1em 0 0.4em 0; }
+p { margin: 0 0 0.8em 0; }
+a { color: var(--c-navy); }
+
+ul.task-list { list-style: none; padding-left: 0; }
+ul.task-list li { margin-bottom: 0.6em; }
+ul.task-list label { display: flex; align-items: flex-start; gap: 0.5em; }
+ul.task-list input[type="checkbox"] { margin-top: 0.2em; }
+
+.statement p { font-weight: 700; font-size: 1.4em; line-height: 1.3; }
+.statement p + p { font-weight: 400; font-size: 1em; margin-top: 1em; }
+
+.frontmatter { font-size: 0.9em; }
+
+nav#TOC ul { list-style: none; padding-left: 0; }
+nav#TOC ul ul { padding-left: 1em; }
+
+/* see the matching note in themes/boardroom/pdf.css */
+.margin-toggle, .sidenote, .marginnote { display: none; }
+
+/* inline body images: reflowable EPUB needs the same cap as the PDF
+   theme (see pdf.css) so a native-resolution illustration doesn't
+   overflow the reader's viewport on narrow screens/e-ink devices. */
+img { display: block; max-width: 100%; height: auto; margin: 1em auto; }
