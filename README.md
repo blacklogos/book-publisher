@@ -9,7 +9,7 @@ Landing page: https://bookpublisher.cc4.marketing
 - Real book structure from plain headings: `#` Part, `##` Chapter, `###` Section, YAML front matter for title and author
 - Cover page, table of contents, roman-numeral front matter that restarts at Chapter 1, running headers
 - Checklists, definition boxes, and sidenotes written as ordinary Markdown
-- Three themes reproducing real reference designs: `boardroom` (corporate lead magnet, default), `tufte` (monochrome academic, margin sidenotes), `jianghu` (translated-novel look, real footnotes)
+- Four themes reproducing real reference designs: `boardroom` (corporate lead magnet, default), `tufte` (monochrome academic, margin sidenotes), `jianghu` (translated-novel look, real footnotes), `haibara` (business-guide look in the spirit of the HBR Guide series: serif body, sans chapter openers, real Contents page)
 - `--facing-pages` for duplex print: mirrored margins, chapters open on a right-hand page
 - Every build renders preview PNGs so layout bugs are caught before shipping
 
@@ -50,7 +50,7 @@ Try `--theme tufte` or `--theme jianghu` on the same command. To write your own 
 
 ## Add a theme
 
-Found a PDF or page whose look you love? `references/themes.md` documents the process used to build the three included themes: sample the real colors, read the real fonts, translate to CSS paged media, plus the WeasyPrint pitfalls already solved.
+Found a PDF or page whose look you love? `references/themes.md` documents the process used to build the four included themes: sample the real colors, read the real fonts, translate to CSS paged media, plus the WeasyPrint pitfalls already solved.
 
 ## License
 

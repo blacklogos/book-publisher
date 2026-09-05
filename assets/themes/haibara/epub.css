@@ -1,0 +1,36 @@
+/* book-publisher theme: haibara — EPUB (reflowable). Same tokens as
+   pdf.css minus page geometry, running heads, footnote floating and the
+   roman/Arabic counter split. */
+:root {
+  --font-serif: Georgia, "Times New Roman", serif;
+  --font-sans: Inter, "Helvetica Neue", Arial, sans-serif;
+  --c-ink: #111111; --c-head: #1d1d1d; --c-muted: #555555; --c-link: #3333ff; --c-rule: #bfbfbf;
+}
+body { font-family: var(--font-serif); color: var(--c-ink); line-height: 1.55; }
+p { margin: 0; text-indent: 1.4em; text-align: justify; }
+h1 + p, h2 + p, h3 + p, h4 + p, li p, .frontmatter > p, .statement p { text-indent: 0; }
+strong { font-family: var(--font-sans); font-weight: 700; font-size: 0.94em; }
+a { color: var(--c-link); text-decoration: none; }
+h1 { font-family: var(--font-sans); font-weight: 300; font-size: 1.5em; line-height: 1.15; color: var(--c-head); margin: 2em 0 0 0; break-before: page; }
+h2 { font-family: var(--font-sans); font-weight: 700; font-size: 1.9em; line-height: 1.12; color: var(--c-head); margin: 0.1em 0 1.6em 0; }
+h3 { font-family: var(--font-sans); font-weight: 700; font-style: italic; font-size: 1.1em; color: var(--c-head); margin: 1.3em 0 0.4em 0; }
+h4 { font-family: var(--font-sans); font-weight: 600; font-size: 1em; color: var(--c-head); margin: 1em 0 0.3em 0; }
+ol, ul { margin: 0.6em 0 0.8em 0; padding-left: 1.7em; }
+li { margin-bottom: 0.5em; }
+ul.task-list { list-style: none; padding-left: 0; }
+ul.task-list li { margin-bottom: 0.6em; }
+ul.task-list label { display: flex; align-items: flex-start; gap: 0.5em; }
+ul.task-list input[type="checkbox"] { margin-top: 0.2em; }
+.statement p { text-align: left; margin: 0 0 0.7em 0; }
+.statement p:first-child { font-family: var(--font-sans); font-weight: 700; font-size: 1.4em; line-height: 1.2; margin-bottom: 1.4em; }
+.frontmatter { font-size: 0.85em; }
+.frontmatter p { margin: 0 0 0.6em 0; text-align: left; }
+.footnote { font-size: 0.85em; color: var(--c-muted); text-indent: 0; }
+.footnote::before { content: " [ "; }
+.footnote::after { content: " ] "; }
+nav#TOC ul { list-style: none; padding-left: 0; }
+nav#TOC > ul > li > a { font-family: var(--font-sans); font-weight: 700; }
+nav#TOC ul ul { padding-left: 1.4em; }
+nav#TOC ul ul ul { display: none; }
+.margin-toggle, .sidenote, .marginnote { display: none; }
+img { display: block; max-width: 100%; height: auto; margin: 1em auto; }

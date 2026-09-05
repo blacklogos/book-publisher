@@ -34,7 +34,7 @@ lightweight glossary pattern:
 - [ ] **Time:** expected hours, sessions, and deadlines.
 - [ ] **Fee:** hourly rate, fixed fee, or minimum.
 
-A sidenote<label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"><span class="sidenote">Hand-authored raw HTML, see content-model.md. Renders as a margin note in the `tufte` theme; hidden (no rail to put it in) in `boardroom`.</span> is written inline like this, right after the word it annotates.
+A sidenote<label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle" /><span class="sidenote">Hand-authored raw HTML, see content-model.md. Renders as a margin note in the `tufte` theme; hidden (no rail to put it in) in `boardroom`.</span> is written inline like this, right after the word it annotates.
 
 ### 1.2 A Second Section
 

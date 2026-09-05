@@ -12,7 +12,7 @@ title: Book Title
 subtitle: Optional subtitle
 running-title: "Book Title: Optional subtitle"   # top-right header text
 footer-brand: "PUBLISHER NAME"                   # bottom-left footer text
-footer-cta: "yourdomain.com | "                  # bottom-right, before page #
+footer-cta: "yourdomain.com |"                   # bottom-right, before page # (a space is added)
 publisher-name: "PUBLISHER NAME"                 # small wordmark on cover
 cover-image: "/absolute/path/to/art.png"         # optional illustrated cover,
                                                    # both themes — see themes.md
@@ -59,9 +59,14 @@ chapter on its own fresh page without that side effect. See
   convention (there's no lighter Markdown syntax for this upstream
   either):
   ```html
-  word<label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle"><span class="sidenote">Note text.</span>
+  word<label for="sn-1" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-1" class="margin-toggle" /><span class="sidenote">Note text.</span>
   ```
-  Each note needs a unique `id`/`for` pair. Themes without a margin rail
+  Each note needs a unique `id`/`for` pair. Self-close every raw void
+  element (`<input ... />`, `<img ... />`, `<br />`): pandoc copies raw
+  HTML verbatim into the EPUB's XHTML, where an unclosed `<input>` is a
+  fatal "tag mismatch" in Apple Books/Calibre even though WeasyPrint
+  renders it fine. `build_book.py` now runs `xmllint` on the EPUB and
+  fails the build on this. Themes without a margin rail
   (e.g. `boardroom`) hide `.sidenote`/`.marginnote`/`.margin-toggle` cleanly
   rather than rendering them broken — the note's content is simply lost
   in those themes, which is expected, not a bug.

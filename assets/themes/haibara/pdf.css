@@ -1,0 +1,248 @@
+/* book-publisher theme: haibara — business-guide look reverse-engineered
+   from "HBR Guide to Getting the Right Work Done" (Harvard Business Review
+   Press, 2012). Measured from the reference PDF (372x642pt trim; text
+   block 65pt left / 60pt right / 70pt top / 54pt bottom; running head at
+   37pt from the top edge on the outer corner; folio 54pt from the bottom
+   edge on the outer corner; chapter and section openers start 154pt down
+   with the body resuming at roughly half the page). Reference fonts are
+   Miller Text (body) and National (headings, running heads, bold lead-ins):
+   substituted with Georgia and Inter, both shape Vietnamese correctly.
+   Monochrome except hyperlinks (reference uses #3333ff). */
+
+:root {
+  --font-serif: Georgia, "Times New Roman", "Liberation Serif", serif;
+  --font-sans: Inter, "Helvetica Neue", "Avenir Next", Arial, sans-serif;
+  --c-ink: #111111;
+  --c-head: #1d1d1d;      /* headings, running head */
+  --c-muted: #555555;
+  --c-link: #3333ff;
+  --c-paper: #ffffff;
+  --c-rule: #bfbfbf;
+}
+
+* { box-sizing: border-box; }
+
+/* ---- page geometry (see header note for the measurements) ---- */
+@page {
+  size: 372pt 642pt;
+  background: var(--c-paper);
+  margin: 70pt 60pt 54pt 65pt;
+  @top-right { font-family: var(--font-sans); font-weight: 500; font-size: 8.5pt;
+               color: var(--c-head); vertical-align: middle; }
+  /* verso running head under --facing-pages (template moves it to top-left) */
+  @top-left { font-family: var(--font-sans); font-weight: 500; font-size: 8.5pt;
+              color: var(--c-head); vertical-align: middle; }
+  @bottom-left { font-family: var(--font-sans); font-weight: 500; font-size: 8.5pt;
+                 color: var(--c-head); vertical-align: top; padding-top: 4pt; }
+  @bottom-right { font-family: var(--font-sans); font-weight: 500; font-size: 8.5pt;
+                  color: var(--c-head); vertical-align: top; padding-top: 4pt; }
+  @footnote { border-top: 0.5pt solid var(--c-rule); padding-top: 5pt; margin-top: 10pt; }
+}
+
+@page cover {
+  size: 600pt 900pt;
+  margin: 0;
+  /* margin:0 alone doesn't stop the generic @page rule's running-header/
+     footer *content* from painting past a zero-size margin box (gotcha
+     documented in every theme) — explicitly clear it. */
+  @top-right { content: none; }
+  @bottom-left { content: none; }
+  @bottom-right { content: none; }
+}
+
+/* ---- front-matter / main-matter pagination split ----
+   Roman numerals on copyright / promo / contents pages, Arabic 1 at the
+   first Part heading — the reference numbers its front matter vi..xii and
+   starts "Section 1" at page 1. Mechanism and caveats: see the jianghu
+   theme and references/themes.md (counter-reset only works inside @page;
+   each named page restates the full geometry). */
+section.frontmatter, section.statement, #TOC { page: frontmatter; }
+@page frontmatter {
+  size: 372pt 642pt;
+  background: var(--c-paper);
+  margin: 70pt 60pt 54pt 65pt;
+  @top-right { content: none; }
+  @bottom-left { content: none; }
+  @bottom-right { content: counter(page, lower-roman); font-family: var(--font-sans);
+                  font-weight: 500; font-size: 8.5pt; color: var(--c-head);
+                  vertical-align: top; padding-top: 4pt; }
+}
+article.content > h1:first-of-type { page: mainmatter; }
+@page mainmatter {
+  size: 372pt 642pt;
+  background: var(--c-paper);
+  margin: 70pt 60pt 54pt 65pt;
+  counter-reset: page 1;
+  @top-right { font-family: var(--font-sans); font-weight: 500; font-size: 8.5pt;
+               color: var(--c-head); vertical-align: middle; }
+  /* verso running head under --facing-pages (template moves it to top-left) */
+  @top-left { font-family: var(--font-sans); font-weight: 500; font-size: 8.5pt;
+              color: var(--c-head); vertical-align: middle; }
+  @bottom-left { font-family: var(--font-sans); font-weight: 500; font-size: 8.5pt;
+                 color: var(--c-head); vertical-align: top; padding-top: 4pt; }
+  @bottom-right { content: counter(page); font-family: var(--font-sans); font-weight: 500;
+                  font-size: 8.5pt; color: var(--c-head); vertical-align: top; padding-top: 4pt; }
+  @footnote { border-top: 0.5pt solid var(--c-rule); padding-top: 5pt; margin-top: 10pt; }
+}
+
+html { background: var(--c-paper); }
+body {
+  font-family: var(--font-serif); color: var(--c-ink); background: var(--c-paper);
+  font-size: 10.5pt; line-height: 1.55;
+}
+article.content { orphans: 3; widows: 3; }
+
+/* ---- body paragraphs: first-line indent, no gap (the reference's model);
+   flush after a heading. Hyphens left at `manual`: auto-hyphenation is
+   not Vietnamese-aware (see references/themes.md). */
+p { margin: 0; text-indent: 1.4em; text-align: justify; }
+h1 + p, h2 + p, h3 + p, h4 + p, li p,
+section.frontmatter > p, .statement p { text-indent: 0; }
+/* bold runs are sans in the reference (numbered-list lead-ins, key terms) */
+strong { font-family: var(--font-sans); font-weight: 700; font-size: 0.94em; }
+em { font-style: italic; }
+a { color: var(--c-link); text-decoration: none; }
+
+/* ---- heading system: h1=Part, h2=Chapter, h3=Section ----
+   Opener: h1 is the light "Section 1 / Chapter 1"-style label line, h2 the
+   bold title under it; both sans, both left; body resumes ~half a page
+   down. Only h1 breaks the page (content-model.md: repeat `# Part` before
+   every `## Chapter`), so the opener drop lives on h1. */
+h1 {
+  page-break-before: always;
+  font-family: var(--font-sans); font-weight: 300; font-size: 15pt;
+  letter-spacing: -0.01em; line-height: 1.2; color: var(--c-head);
+  margin: 84pt 0 2pt 0;
+}
+h2 {
+  font-family: var(--font-sans); font-weight: 700; font-size: 22pt;
+  letter-spacing: -0.015em; line-height: 1.12; color: var(--c-head);
+  margin: 0 0 72pt 0;
+  page-break-after: avoid;
+}
+h3 {
+  font-family: var(--font-sans); font-weight: 700; font-style: italic;
+  font-size: 11.5pt; letter-spacing: -0.005em; color: var(--c-head);
+  margin: 16pt 0 5pt 0;
+  page-break-after: avoid;
+}
+h4 {
+  font-family: var(--font-sans); font-weight: 600; font-size: 10.5pt;
+  color: var(--c-head); margin: 12pt 0 3pt 0;
+  page-break-after: avoid;
+}
+
+/* ---- lists: serif numerals, generous item spacing, hanging text ---- */
+ol, ul { margin: 8pt 0 10pt 0; padding-left: 1.7em; }
+li { margin-bottom: 7pt; text-align: justify; }
+li:last-child { margin-bottom: 0; }
+
+hr { border: 0; border-top: 0.5pt solid var(--c-rule); width: 30%; margin: 14pt 0; }
+
+/* ---- footnotes: real bottom-of-page notes (CSS GCPM `float: footnote`),
+   authored as word<span class="footnote">Note.</span> — see jianghu. */
+.footnote {
+  float: footnote;
+  font-family: var(--font-serif);
+  font-size: 8pt; line-height: 1.4; color: var(--c-muted);
+  text-indent: 0;
+}
+::footnote-call { content: counter(footnote); vertical-align: super; font-size: 0.68em; }
+::footnote-marker { content: counter(footnote) ". "; color: var(--c-ink); }
+
+/* ---- checklists: "- [ ] **Label:** text" (pandoc task_lists) ---- */
+ul.task-list { list-style: none; padding-left: 0; margin: 0 0 12pt 0; }
+ul.task-list li { margin-bottom: 7pt; page-break-inside: avoid; }
+ul.task-list label { display: block; overflow: hidden; }
+ul.task-list input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none;
+  float: left;
+  width: 8pt; height: 8pt; margin: 3pt 7pt 0 0;
+  border: 0.75pt solid var(--c-ink); background: var(--c-paper);
+}
+
+/* ---- full-page statement / promo (front-matter `promo:` or `::: statement`) ----
+   Styled like the reference's "What You'll Learn" page: a bold sans title
+   line, then serif body. First paragraph = title. */
+.statement { page-break-before: always; page-break-after: always; padding-top: 84pt; }
+.statement p {
+  font-family: var(--font-serif); font-size: 10.5pt; line-height: 1.55;
+  color: var(--c-ink); margin: 0 0 9pt 0; text-align: left;
+}
+.statement p:first-child {
+  font-family: var(--font-sans); font-weight: 700; font-size: 15pt;
+  line-height: 1.2; letter-spacing: -0.01em; color: var(--c-head); margin: 0 0 22pt 0;
+}
+
+/* ---- front matter (copyright page): small serif, flush left ---- */
+section.frontmatter { font-size: 8.5pt; line-height: 1.5; color: var(--c-ink); padding-top: 84pt; }
+section.frontmatter p { margin: 0 0 8pt 0; text-align: left; }
+
+/* ---- table of contents (pandoc --toc output) ----
+   "Contents" title, Part entries as bold sans, Chapter entries in serif
+   with a right-aligned page number (WeasyPrint's target-counter), Section
+   entries hidden — the reference lists chapters only. The title string
+   follows the manuscript's `lang:` front-matter field. */
+#TOC { margin: 0 0 24pt 0; padding-top: 84pt; }
+#TOC::before {
+  content: "Contents"; display: block;
+  font-family: var(--font-sans); font-weight: 700; font-size: 15pt;
+  letter-spacing: -0.01em; color: var(--c-head); margin: 0 0 30pt 0;
+}
+html[lang^="vi"] #TOC::before { content: "Mục lục"; }
+#TOC ul { list-style: none; padding-left: 0; margin: 0; }
+#TOC > ul > li { margin-top: 16pt; }
+#TOC a { text-decoration: none; color: inherit; }
+#TOC > ul > li > a {
+  font-family: var(--font-sans); font-weight: 700; font-size: 9.5pt;
+  color: var(--c-head); display: block; margin-bottom: 6pt;
+}
+#TOC ul ul > li { margin-top: 4pt; padding-left: 1.4em; }
+#TOC ul ul > li > a { font-family: var(--font-serif); font-size: 10.5pt; color: var(--c-ink); display: block; }
+#TOC ul ul > li > a::after {
+  content: leader(" ") target-counter(attr(href), page);
+  font-family: var(--font-sans); font-weight: 500; font-size: 9pt;
+}
+#TOC ul ul ul { display: none; }
+
+/* ---- cover (page 1 only, custom 600x900pt trim) ----
+   White cover, bold sans title block in the upper third, light subtitle,
+   logo bottom-left — the reference's own cover composition. */
+.cover {
+  page: cover; position: relative;
+  width: 600pt; height: 900pt;
+  background: var(--c-paper); color: var(--c-head);
+  padding: 130pt 70pt 70pt 70pt;
+}
+.cover-title {
+  page-break-before: avoid; letter-spacing: -0.02em;
+  font-family: var(--font-sans); font-weight: 700; font-size: 44pt;
+  line-height: 1.05; margin: 0; color: var(--c-head); text-indent: 0;
+  position: relative; /* paints above the illustrated-cover ::before tint, see tufte/pdf.css */
+}
+.cover-subtitle {
+  font-family: var(--font-sans); font-weight: 300; font-size: 19pt;
+  color: var(--c-head); margin: 16pt 0 0 0; line-height: 1.3; text-indent: 0;
+  position: relative;
+}
+.cover-logo {
+  position: absolute; left: 70pt; bottom: 70pt;
+  font-family: var(--font-sans); font-weight: 700; font-size: 11pt;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--c-head);
+}
+
+/* no margin rail in this theme; hide tufte-authored sidenotes cleanly */
+.margin-toggle, .sidenote, .marginnote { display: none; }
+
+/* ---- inline body images ---- */
+article.content img { display: block; max-width: 100%; height: auto; margin: 12pt auto; }
+
+/* ---- illustrated cover (optional, `cover-image:` front matter) ----
+   Same ::before-overlay mechanism as the other themes (see tufte/pdf.css
+   for why it is not a second background-image layer). White tint so the
+   dark sans title stays legible. */
+.cover[style]::before {
+  content: "";
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+  background: linear-gradient(rgba(255,255,255,0.35), rgba(255,255,255,0.6) 55%, rgba(255,255,255,0.92));
+}

@@ -34,6 +34,38 @@ scripts/build_book.py manuscript.md --theme tufte
   roman-numeral front matter" below for the two WeasyPrint mechanisms
   this theme introduced, reusable by any future theme.
 
+- **haibara** — business-guide look reverse-engineered from "HBR Guide to
+  Getting the Right Work Done" (Harvard Business Review Press, 2012).
+  Measured from the PDF, not guessed: 372x642pt trim; text block 65pt
+  left / 60pt right / 70pt top / 54pt bottom; running head (sans, 8.5pt)
+  37pt from the top edge on the outer corner; folio 54pt from the bottom
+  edge on the outer corner; Section/Chapter openers start 154pt down the
+  page with the body resuming about halfway. Miller Text + National in
+  the original → Georgia + Inter here (both shape Vietnamese). Body has
+  first-line indents and no paragraph gap; bold runs switch to sans, the
+  reference's numbered-list lead-in convention. Front matter counts in
+  roman numerals (jianghu's named-page mechanism), the TOC gets a
+  "Contents"/"Mục lục" title (from the manuscript's `lang:` field) and
+  per-chapter page numbers via `target-counter()` + `leader()`, and
+  Section (h3) entries are hidden from the TOC as in the reference.
+  Monochrome except links (#3333ff, sampled). Tokens at the top of
+  `themes/haibara/pdf.css`.
+
+## Page furniture: keep the folio at the page edge
+
+tufte originally reserved its sidenote rail as a 200pt right @page
+margin. Side effect: the running head and page number, which live in the
+@page margin boxes, rendered out in the rail, 150pt away from the text
+block — visibly wrong next to any printed book. Fixed (2026-09) by giving
+the page symmetric 54pt margins and moving the rail into
+`article.content { padding-right: 146pt }` (plus the same padding on
+`section.frontmatter`/`section.statement` so every page keeps one column).
+Sidenotes still float into the rail with a fixed negative `margin-right`;
+the folio and running head now sit at the outer page margin. Rule for new
+themes: never widen a @page margin to create a text-column effect — use
+padding on the content container and leave @page margins for page
+furniture only.
+
 ## Illustrated covers and inline images
 
 Both themes support a generated-art cover and inline illustrations, shipped
@@ -204,6 +236,23 @@ other page mirrors correctly.
    that only show up once you look at more than one page.
 
 ## Known WeasyPrint gotchas (apply to every theme)
+
+- Pandoc's default `--wrap=auto` (72 columns) also wraps the template's
+  inline `<style>`: a `running-title` longer than ~60 characters got a
+  raw newline inside `content: "..."`, which CSS treats as a bad string —
+  that dropped the running head *and* corrupted the `@bottom-left` /
+  `@bottom-right` declarations after it, so no brand or folio rendered on
+  any page, with no error. `build_book.py` now passes `--wrap=none`.
+  Symptom to recognise: margin boxes empty in every theme at once.
+- Because the manuscript repeats `# Part` before every `## Chapter`,
+  pandoc's `--toc` lists the Part once per chapter. `build_book.py`
+  (`dedupe_toc_parts`) folds consecutive identical top-level entries and
+  nests their chapters under the first, after pandoc and before
+  WeasyPrint. Themes can rely on one `<li>` per Part in `#TOC`.
+- `target-counter(attr(href), page)` + `leader(" ")` work in WeasyPrint
+  for TOC page numbers (haibara uses them); the `#TOC` page must sit on
+  the same named page as the rest of the front matter for the numbers to
+  come out roman/Arabic consistently with the folios.
 
 - `@page cover { margin: 0; }` does not, by itself, stop a *different*
   `@page { @bottom-right { content: ... } }` rule from painting into

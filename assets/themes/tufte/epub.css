@@ -26,10 +26,21 @@ a { color: inherit; }
 span.newthought { font-variant: small-caps; font-size: 1.1em; }
 hr { border: 0; border-top: 1px solid #ccc; width: 40%; margin: 1em 0; }
 
-.sidenote, .marginnote {
-  display: inline; font-size: 0.85em; color: var(--c-muted); font-style: italic;
-}
-.sidenote-number { font-size: 0.7em; vertical-align: super; }
+/* Sidenotes in reflowable EPUB: no margin rail exists, so a note degrades
+   to a bracketed inline aside at its anchor ("word¹ [1 note text] ..."),
+   the same convention jianghu's epub.css uses for footnotes. A block
+   form was tried and rejected: it splits the host sentence in two. The
+   print-only checkbox toggle is hidden; the empty label carries a CSS
+   counter as the reference number. */
+body { counter-reset: sidenote; }
+input.margin-toggle { display: none; }
+label.margin-toggle { font-size: 0.7em; vertical-align: super; }
+label.sidenote-number::after { counter-increment: sidenote; content: counter(sidenote); }
+.sidenote { font-size: 0.85em; color: var(--c-muted); }
+.sidenote::before { content: " [" counter(sidenote) " "; }
+.sidenote::after { content: "] "; }
+.marginnote { display: block; font-size: 0.85em; line-height: 1.45; color: var(--c-muted); margin: 0.5em 0 0.9em 0; }
+.marginnote img { margin: 0 0 0.4em 0; max-width: 60%; }
 
 ul.task-list { list-style: none; padding-left: 0; }
 ul.task-list li { margin-bottom: 0.6em; }

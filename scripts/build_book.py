@@ -73,6 +73,14 @@ def build_pdf(md: Path, out: Path, theme: Path, extra_css: Path | None, facing_p
         "-f", "markdown+task_lists+fenced_divs+yaml_metadata_block+raw_html",
         "-t", "html5",
         "--template", str(ASSETS / "template.pdf.html5"),
+        # --wrap=none: pandoc's default 72-column wrapping also applies to
+        # the template's inline <style>, so a running-title longer than
+        # ~60 chars got a raw newline inside its CSS string. An unescaped
+        # newline ends the string as a "bad string" token, which dropped
+        # that @top-right rule *and* mangled the @bottom-left/@bottom-right
+        # declarations after it — no running head, brand or folio on any
+        # page, silently. Found on a Vietnamese title in 2026-09.
+        "--wrap=none",
         "--toc", "--toc-depth=3",
         "-V", f"pdf-css={theme / 'pdf.css'}",
         "-o", str(html_tmp),
@@ -92,9 +100,55 @@ def build_pdf(md: Path, out: Path, theme: Path, extra_css: Path | None, facing_p
     if extra_css:
         cmd += ["--css", str(extra_css)]
     run(cmd)
+    dedupe_toc_parts(html_tmp)
     run(["weasyprint", str(html_tmp), str(pdf_out)], env=weasyprint_env())
     html_tmp.unlink()
     return pdf_out
+
+
+def dedupe_toc_parts(html_path: Path) -> None:
+    """Merge consecutive top-level TOC entries with identical link text.
+
+    content-model.md requires the `# Part` heading to be repeated before
+    every `## Chapter` (only h1 breaks the page), so pandoc's --toc lists
+    "Part II" once per chapter. A printed contents page shows each Part
+    once with its chapters nested under it; this folds the repeats and
+    moves their chapter <li>s under the first occurrence. Pandoc's nav
+    fragment is well-formed XHTML, so a strict XML parse is safe."""
+    import re
+    import xml.etree.ElementTree as ET
+    html = html_path.read_text(encoding="utf-8")
+    m = re.search(r'(<nav id="TOC"[^>]*>)(.*?)(</nav>)', html, flags=re.S)
+    if not m:
+        return
+    try:
+        root = ET.fromstring("<root>" + m.group(2) + "</root>")
+    except ET.ParseError:
+        return  # leave the TOC untouched rather than risk a broken build
+    top = root.find("ul")
+    if top is None:
+        return
+    merged, prev_text, prev_li = [], None, None
+    for li in list(top):
+        a = li.find("a")
+        text = "".join(a.itertext()).strip() if a is not None else None
+        sub = li.find("ul")
+        if text is not None and text == prev_text and prev_li is not None:
+            target = prev_li.find("ul")
+            if target is None:
+                target = ET.SubElement(prev_li, "ul")
+            if sub is not None:
+                for child in list(sub):
+                    target.append(child)
+            continue
+        merged.append(li)
+        prev_text, prev_li = text, li
+    for li in list(top):
+        top.remove(li)
+    for li in merged:
+        top.append(li)
+    inner = "".join(ET.tostring(child, encoding="unicode", method="html") for child in root)
+    html_path.write_text(html[: m.start(2)] + inner + html[m.end(2):], encoding="utf-8")
 
 
 def build_epub(md: Path, out: Path, theme: Path, cover: Path | None, extra_css: Path | None) -> Path:
@@ -114,7 +168,31 @@ def build_epub(md: Path, out: Path, theme: Path, cover: Path | None, extra_css: 
     if cover and cover.exists():
         cmd += ["--epub-cover-image", str(cover)]
     run(cmd)
+    validate_epub_xhtml(epub_out)
     return epub_out
+
+
+def validate_epub_xhtml(epub: Path) -> None:
+    """Fail the build if any XHTML inside the EPUB is not well-formed XML.
+
+    Pandoc copies raw HTML through verbatim, so a hand-authored sidenote
+    written as `<input ...>` (fine in HTML5, and WeasyPrint renders it)
+    produces "Opening and ending tag mismatch: input and p" in every
+    XHTML-strict reader (Apple Books, Calibre). Raw void elements must be
+    self-closed: `<input ... />`, `<img ... />`, `<br />`."""
+    import subprocess, tempfile, zipfile
+    with tempfile.TemporaryDirectory() as tmp:
+        with zipfile.ZipFile(epub) as z:
+            names = [n for n in z.namelist() if n.endswith((".xhtml", ".html"))]
+            z.extractall(tmp, names)
+        bad = []
+        for n in names:
+            r = subprocess.run(["xmllint", "--noout", str(Path(tmp) / n)], capture_output=True, text=True)
+            if r.returncode != 0:
+                bad.append(f"{n}: {r.stderr.strip().splitlines()[0]}")
+    if bad:
+        sys.exit("EPUB XHTML is not well-formed (self-close raw <input>/<img>/<br> in the manuscript):\n  " + "\n  ".join(bad))
+    print(f"EPUB XHTML well-formed ({len(names)} files)")
 
 
 def make_cover_and_preview(pdf: Path, out: Path, pages: int = 3):

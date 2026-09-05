@@ -31,6 +31,11 @@ this look, use it for our book(s)" — that's a request to add a new theme
   paragraphs, centered chapter openers, real bottom-of-page footnotes,
   a gold-rule frontmatter "plate", roman-numeral front matter that
   resets to Arabic 1 at Chapter 1.
+- `haibara` — business-guide look reverse-engineered from the HBR Guide
+  series (2012): 372x642pt trim, serif body with first-line indents, light
+  + bold sans chapter openers a quarter of the way down the page, running
+  head top-outer and folio bottom-outer, roman-numeral front matter, a
+  "Contents" page with real page numbers.
 
 Full details, tokens, and how each was derived: `references/themes.md`.
 
@@ -50,10 +55,16 @@ Full details, tokens, and how each was derived: `references/themes.md`.
 4. Build: `python3 scripts/build_book.py manuscript.md --out dist --theme boardroom`.
    Produces `dist/<name>.pdf`, `dist/<name>.epub`, and
    `dist/preview/page-NN.png` for the first few pages.
-5. **Always view the preview PNGs** before calling the book done — CSS
-   paged-media output has real failure modes (overflow, bad breaks,
-   color mistakes, running header/footer bleeding onto the cover) that
-   only show up rendered, and only sometimes only show up past page 1.
+5. **View rendered pages before calling the book done.** CSS paged-media
+   output has real failure modes (overflow, bad breaks, color mistakes,
+   running header/footer bleeding onto the cover) that only show up
+   rendered, and most of them sit past the three default previews. Read
+   `page-01..03.png`, then rasterize and Read these pages as well: the
+   contents page, the first chapter opener, one page each with a table,
+   a figure, and a sidenote, and the last two pages (rasterize snippet in
+   `references/cli-workflow.md`, "QA loop"). For books over ~40 pages
+   also build a contact sheet (a PIL grid of every page at ~220px wide)
+   and Read it once to catch bad breaks across the whole book.
 6. Iterate on the theme's CSS or the manuscript, rebuild, re-check.
 
 ## Facing pages (print/duplex)

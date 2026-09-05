@@ -18,3 +18,28 @@
    proper DTP tool), not this pipeline. */
 
 h1 { page-break-before: right; }
+
+/* Named front/main-matter pages (pdf.css) carry their own @bottom-right
+   folio so single-sided builds get roman numerals; under facing pages a
+   verso must carry it on the left instead. Named-page + :left outranks
+   the plain rules, so these are restated here rather than in pdf.css. */
+@page frontmatter:left {
+  @top-left { content: none; }
+  @bottom-right { content: none; }
+  @bottom-left { content: counter(page, lower-roman); font-family: var(--font-serif);
+                 font-size: 9.5pt; color: var(--c-ink); vertical-align: top; padding-top: 6pt; }
+}
+@page mainmatter:left {
+  @bottom-right { content: none; }
+  @bottom-left { content: counter(page); font-family: var(--font-serif); font-size: 9.5pt;
+                 color: var(--c-ink); vertical-align: top; padding-top: 6pt; }
+}
+
+/* Blank versos inserted before a recto-opening chapter carry no running
+   head or folio (a printed book's blank page is truly blank). */
+@page :blank {
+  @top-left { content: none; }
+  @top-right { content: none; }
+  @bottom-left { content: none; }
+  @bottom-right { content: none; }
+}

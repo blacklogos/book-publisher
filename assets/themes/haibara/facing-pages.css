@@ -1,0 +1,38 @@
+/* book-publisher theme: haibara — facing-pages overlay (opt-in via
+   scripts/build_book.py --facing-pages). template.pdf.html5's
+   $if(facing-pages)$ branch supplies the mirrored running-head/folio
+   *content* (section name top-left + folio bottom-left on verso, chapter
+   title top-right + folio bottom-right on recto, which is exactly the
+   reference's scheme); this file only adds geometry: a little extra
+   inner (spine-side) margin, chapters opening on a recto page. */
+@page :right { margin: 70pt 56pt 54pt 69pt; }
+@page :left  { margin: 70pt 69pt 54pt 56pt; }
+h1 { page-break-before: right; }
+/* Known limitation (same as jianghu): the frontmatter/mainmatter named
+   pages in pdf.css carry their own unconditional margin and outrank
+   :left/:right, so those few pages keep single-sided margins. */
+
+/* pdf.css's named frontmatter/mainmatter pages hardcode the folio at
+   @bottom-right (correct single-sided); on a verso it must sit at
+   @bottom-left, matching the reference (folio on the outer corner). */
+@page frontmatter:left {
+  @top-left { content: none; }
+  @bottom-right { content: none; }
+  @bottom-left { content: counter(page, lower-roman); font-family: var(--font-sans);
+                 font-weight: 500; font-size: 8.5pt; color: var(--c-head);
+                 vertical-align: top; padding-top: 4pt; }
+}
+@page mainmatter:left {
+  @bottom-right { content: none; }
+  @bottom-left { content: counter(page); font-family: var(--font-sans); font-weight: 500;
+                 font-size: 8.5pt; color: var(--c-head); vertical-align: top; padding-top: 4pt; }
+}
+
+/* Blank versos inserted before a recto-opening chapter carry no running
+   head or folio (a printed book's blank page is truly blank). */
+@page :blank {
+  @top-left { content: none; }
+  @top-right { content: none; }
+  @bottom-left { content: none; }
+  @bottom-right { content: none; }
+}

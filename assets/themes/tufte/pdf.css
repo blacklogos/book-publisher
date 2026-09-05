@@ -32,17 +32,27 @@
      left a visible seam between this theme's off-white paper and the
      plain-white margin frame. */
   background: var(--c-paper);
-  /* Modest left margin, wide right margin — the Tufte "sidenote rail".
-     Same page geometry idea as tufte-css's fluid 55%-column layout,
-     rebuilt for a fixed print page instead of a browser viewport: the
-     rail is real @page margin, not a negative-margin float bled into a
-     wider viewport (there is no wider viewport on a fixed print page). */
-  margin: 60pt 200pt 60pt 54pt;
+  /* Symmetric page margins; the Tufte sidenote rail is article.content's
+     padding-right (below), not a 200pt @page margin as before. Reason:
+     the running head and folio live in @page margin boxes, and with a
+     200pt right margin they sat far out in the rail, detached from the
+     text block. With even margins they align to the page edge exactly
+     like a printed book (reference: HBR Guide series, 2012 — running
+     head at the top-outer corner, folio at the bottom-outer corner).
+     Sidenotes still float into the rail via negative margin-right. */
+  margin: 64pt 54pt 58pt 54pt;
   @top-right   { font-family: var(--font-serif); font-variant: small-caps;
-                 font-size: 8pt; letter-spacing: 0.04em; color: var(--c-muted); }
+                 font-size: 8.5pt; letter-spacing: 0.04em; color: var(--c-muted);
+                 vertical-align: middle; }
+  /* verso running head under --facing-pages (template moves it to top-left) */
+  @top-left    { font-family: var(--font-serif); font-variant: small-caps;
+                 font-size: 8.5pt; letter-spacing: 0.04em; color: var(--c-muted);
+                 vertical-align: middle; }
   @bottom-left { font-family: var(--font-serif); font-variant: small-caps;
-                 font-size: 8pt; letter-spacing: 0.04em; color: var(--c-muted); }
-  @bottom-right{ font-family: var(--font-serif); font-size: 8pt; color: var(--c-muted); }
+                 font-size: 8.5pt; letter-spacing: 0.04em; color: var(--c-muted);
+                 vertical-align: top; padding-top: 6pt; }
+  @bottom-right{ font-family: var(--font-serif); font-size: 9.5pt; color: var(--c-ink);
+                 vertical-align: top; padding-top: 6pt; }
 }
 
 @page cover {
@@ -58,6 +68,41 @@
   @bottom-right { content: none; }
 }
 
+/* ---- front-matter / main-matter pagination split ----
+   Copyright / promo / contents pages count in lower-roman, the first Part
+   heading resets to Arabic 1 (same named-page mechanism as jianghu and
+   haibara; see references/themes.md — counter-reset: page only works
+   inside @page, and each named page must restate the full geometry). */
+section.frontmatter, section.statement, #TOC { page: frontmatter; }
+@page frontmatter {
+  size: letter;
+  background: var(--c-paper);
+  margin: 64pt 54pt 58pt 54pt;
+  @top-right { content: none; }
+  @bottom-left { content: none; }
+  @bottom-right { content: counter(page, lower-roman); font-family: var(--font-serif);
+                  font-size: 9.5pt; color: var(--c-ink); vertical-align: top; padding-top: 6pt; }
+}
+article.content > h1:first-of-type { page: mainmatter; }
+@page mainmatter {
+  size: letter;
+  background: var(--c-paper);
+  margin: 64pt 54pt 58pt 54pt;
+  counter-reset: page 1;
+  @top-right   { font-family: var(--font-serif); font-variant: small-caps;
+                 font-size: 8.5pt; letter-spacing: 0.04em; color: var(--c-muted);
+                 vertical-align: middle; }
+  /* verso running head under --facing-pages (template moves it to top-left) */
+  @top-left    { font-family: var(--font-serif); font-variant: small-caps;
+                 font-size: 8.5pt; letter-spacing: 0.04em; color: var(--c-muted);
+                 vertical-align: middle; }
+  @bottom-left { font-family: var(--font-serif); font-variant: small-caps;
+                 font-size: 8.5pt; letter-spacing: 0.04em; color: var(--c-muted);
+                 vertical-align: top; padding-top: 6pt; }
+  @bottom-right{ content: counter(page); font-family: var(--font-serif); font-size: 9.5pt;
+                 color: var(--c-ink); vertical-align: top; padding-top: 6pt; }
+}
+
 /* html, not just body: WeasyPrint only extends the *content* box's
    background to the full page canvas (margins included) when it comes
    from the root element — body-only left the page-margin frame pure
@@ -67,6 +112,12 @@ body {
   font-family: var(--font-serif); color: var(--c-ink); background: var(--c-paper);
   font-size: 11pt; line-height: 1.5;
 }
+/* the sidenote rail: 146pt of padding inside the content box keeps the
+   358pt text column the theme always had, while page furniture (running
+   head, folio) sits at the real page margin. section.frontmatter and
+   section.statement live outside article.content, so they get the same
+   padding to keep one consistent column across the book. */
+article.content, section.frontmatter, section.statement { padding-right: 146pt; }
 article.content { orphans: 3; widows: 3; }
 
 /* ---- heading system: h1=Part, h2=Chapter, h3=Section ----
@@ -81,7 +132,9 @@ h1 {
   page-break-before: always;
   font-family: var(--font-serif); font-variant: small-caps; font-weight: 400;
   font-size: 11pt; letter-spacing: 0.03em; color: var(--c-muted);
-  margin: 0 0 4pt 0;
+  /* chapter opener drops about a quarter of the page before the heading
+     (64pt margin + 90pt = 154pt, the HBR Guide opener position) */
+  margin: 90pt 0 4pt 0;
 }
 h2 {
   font-family: var(--font-serif); font-weight: 400; font-size: 30pt;
@@ -111,17 +164,16 @@ hr { border: 0; border-top: 1pt solid var(--c-rule); width: 40%; margin: 1em 0; 
 
 /* ---- sidenotes / margin notes ----
    Hand-authored raw HTML (see content-model.md): a note that floats
-   into the @page right margin (reserved above at 200pt) next to where
+   into article.content's 146pt padding-right rail next to where
    it's referenced, instead of a bottom-of-page footnote. Fixed pt
    values, not tufte-css's negative-margin percentage: percentages here
    would resolve against the 358pt content column, not the page, so a
-   %-based negative margin can't reliably land inside a 200pt margin
-   that's a different container altogether — pt keeps the arithmetic
-   exact. Right edge lands 10pt inside the page's outer edge, left edge
-   starts 20pt clear of the content column. */
+   %-based negative margin can't reliably land inside the rail — pt keeps
+   the arithmetic exact. Right edge lands on the page margin (aligned with
+   the folio), left edge starts 16pt clear of the content column. */
 .sidenote, .marginnote {
   float: right; clear: right;
-  width: 170pt; margin-right: -190pt;
+  width: 130pt; margin-right: -146pt;
   font-size: 9pt; line-height: 1.35; color: var(--c-muted);
 }
 .sidenote-number { font-size: 0.7em; vertical-align: super; }

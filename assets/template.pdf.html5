@@ -21,7 +21,7 @@ $if(footer-brand)$
   @bottom-left { content: "$footer-brand$"; }
 $endif$
 $if(footer-cta)$
-  @bottom-right { content: "$footer-cta$" counter(page); }
+  @bottom-right { content: "$footer-cta$ " counter(page); }
 $else$
   @bottom-right { content: counter(page); }
 $endif$
@@ -34,7 +34,7 @@ $if(footer-brand)$
   @bottom-right { content: "$footer-brand$"; }
 $endif$
 $if(footer-cta)$
-  @bottom-left { content: "$footer-cta$" counter(page); }
+  @bottom-left { content: "$footer-cta$ " counter(page); }
 $else$
   @bottom-left { content: counter(page); }
 $endif$
@@ -48,7 +48,7 @@ $if(footer-brand)$
   @bottom-left { content: "$footer-brand$"; }
 $endif$
 $if(footer-cta)$
-  @bottom-right { content: "$footer-cta$" counter(page); }
+  @bottom-right { content: "$footer-cta$ " counter(page); }
 $else$
   @bottom-right { content: counter(page); }
 $endif$
