@@ -27,27 +27,42 @@
 
   <!-- Structured Data: SoftwareApplication -->
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "Book Publisher",
-    "applicationCategory": "DesktopApplication",
-    "operatingSystem": "macOS, Linux",
-    "url": "https://bookpublisher.cc4.marketing/",
-    "description": "Builds designed PDF and EPUB books from one Markdown file. Four real themes, cover pages, sidenotes, print-ready pagination. An agent skill, free and offline.",
-    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-    "softwareVersion": "0.1.0",
-    "codeRepository": "https://github.com/blacklogos/book-publisher",
-    "featureList": [
-      "One Markdown manuscript builds both PDF and EPUB",
-      "Four swappable themes derived from real reference designs",
-      "Cover page, TOC, roman-numeral front matter, running headers",
-      "Checklists, definition boxes, sidenotes, and real footnotes",
-      "Facing-pages mode with mirrored margins for duplex print",
-      "Automatic preview PNGs of rendered pages for QA",
-      "Works with Claude Code, Codex, and any agent that reads skill folders"
-    ]
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Book Publisher",
+  "applicationCategory": "DesktopApplication",
+  "operatingSystem": "macOS, Linux",
+  "url": "https://bookpublisher.cc4.marketing/",
+  "description": "Builds designed PDF and EPUB books from one Markdown file. Four real themes, cover pages, sidenotes, print-ready pagination. An agent skill, free and offline.",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "softwareVersion": "0.1.0",
+  "codeRepository": "https://github.com/blacklogos/book-publisher",
+  "featureList": [
+    "One Markdown manuscript builds both PDF and EPUB",
+    "Four swappable themes derived from real reference designs",
+    "Cover page, TOC, roman-numeral front matter, running headers",
+    "Checklists, definition boxes, sidenotes, and real footnotes",
+    "Facing-pages mode with mirrored margins for duplex print",
+    "Automatic preview PNGs of rendered pages for QA",
+    "Works with Claude Code, Codex, and any agent that reads skill folders"
+  ],
+  "publisher": {
+    "@type": "Organization",
+    "name": "CC4.Marketing",
+    "url": "https://cc4.marketing/",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cc4.marketing/apple-touch-icon.png",
+      "width": 180,
+      "height": 180
+    }
   }
+}
   </script>
 
   <!-- Structured Data: FAQPage -->
@@ -378,6 +393,30 @@
     }
     @media (max-width: 480px) { .steps { grid-template-columns: 1fr; } }
   </style>
+<!-- cc4-analytics:start -->
+<script>
+  // Same stack as cc4.marketing. Only the production host reports; previews stay out.
+  if (location.hostname === 'bookpublisher.cc4.marketing') {
+    var cc4s = function (src, attrs) {
+      var s = document.createElement('script'); s.src = src; s.defer = true;
+      for (var k in attrs) s.setAttribute(k, attrs[k]);
+      document.head.appendChild(s);
+    };
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () { dataLayer.push(arguments); };
+    gtag('js', new Date()); gtag('config', 'G-RERRE2NHVP');
+    cc4s('https://www.googletagmanager.com/gtag/js?id=G-RERRE2NHVP', {});
+    cc4s('https://bialytics.biplus.com.vn/js/script.js', { 'data-domain': 'cc4.marketing' });
+    cc4s('https://s.cc4.marketing/beacon.js', { 'data-site': 'bookpublisher.cc4.marketing' });
+  }
+</script>
+<!-- cc4-analytics:end -->
+<!-- cc4-og-image:start -->
+<meta property="og:image" content="https://bookpublisher.cc4.marketing/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://bookpublisher.cc4.marketing/og-image.png">
+<!-- cc4-og-image:end -->
 </head>
 <body>
 
@@ -728,5 +767,10 @@
       });
     });
   </script>
+<!-- cc4-hub-link:start -->
+<p style="text-align:center;font-size:13px;opacity:.75;margin:16px 0">
+  A free tool from <a href="https://cc4.marketing/?utm_source=bookpublisher&amp;utm_medium=footer&amp;utm_campaign=hub-link">cc4.marketing</a>, the free Claude Code course for marketers.
+</p>
+<!-- cc4-hub-link:end -->
 </body>
 </html>

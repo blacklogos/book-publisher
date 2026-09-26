@@ -1,0 +1,61 @@
+# Book Publisher
+
+> Builds designed PDF and EPUB books from one Markdown file. Four real themes, cover pages, sidenotes, print-ready pagination. An agent skill, free and offline.
+
+Book Publisher is a free tool published by CC4.Marketing (https://cc4.marketing/), the free Claude Code course for marketers.
+
+## Pages
+
+- [Book Publisher](https://bookpublisher.cc4.marketing/)
+
+## FAQ
+
+### What does Book Publisher do?
+
+Book Publisher is an agent skill that turns a single Markdown manuscript into a designed PDF and EPUB book. It produces a full-bleed cover, table of contents, part and chapter openers, page numbers, running headers, sidenotes, and checklists, all from plain Markdown headings and front matter.
+
+### How do I install Book Publisher for Claude Code?
+
+Unzip the package and copy the book-publisher folder into your skills directory: cp -R book-publisher ~/.claude/skills/ for all projects, or into your-repo/.claude/skills/ for one project. Open a new Claude session and ask for a book; the skill activates automatically.
+
+### How do I use Book Publisher with an AI agent?
+
+After installing, just describe the book you want in plain language, for example 'Turn my notes into a lead magnet PDF' or 'Write a 5-chapter guide to sourdough and build it as a book'. The agent reads the skill, writes or adapts the manuscript, builds the PDF and EPUB, and inspects rendered preview images before handing it over. No commands needed from you.
+
+### What themes are included in Book Publisher?
+
+Book Publisher ships four themes: boardroom, a corporate lead-magnet look with colored headings and a full-bleed cover; tufte, a monochrome academic style with margin sidenotes adapted from Tufte CSS; jianghu, a translated-novel look with digest trim, centered chapter openers, and real bottom-of-page footnotes; and haibara, a business-guide look in the spirit of the HBR Guide series with a serif body, sans chapter openers, and a Contents page with real page numbers. Switching themes is one flag and never requires manuscript changes.
+
+### Do I need to know CSS or book design to use Book Publisher?
+
+No. Book Publisher encodes the design decisions: where chapters break, how the table of contents nests, how front matter is numbered. You write ordinary Markdown headings and the themes handle typography and pagination. Design tokens are exposed as CSS custom properties only if you want to customize.
+
+### What dependencies does Book Publisher need?
+
+Book Publisher needs two tools: pandoc for Markdown conversion and weasyprint for print-quality PDF rendering. The included check_deps.py script detects your OS and prints the exact install commands, for example brew install pandoc and uv tool install weasyprint on macOS. Everything else is Python standard library.
+
+### Can Book Publisher make print-ready books for double-sided printing?
+
+Yes. Add the --facing-pages flag and margins mirror between left and right pages, running headers alternate, and every chapter opens on a right-hand page, inserting a blank left page when needed, the way bound books do. Without the flag you get single-sided output ideal for screen reading.
+
+### Can I create my own theme from a design I like?
+
+Yes. Book Publisher documents the exact process used to build its four themes: fetch the reference PDF or web page, sample the real colors, read the real fonts and CSS, then translate to print CSS. Hand your agent the reference and say 'make a theme from this'; the guide in references/themes.md covers the known pitfalls.
+
+### What Markdown conventions does the manuscript use?
+
+Simple ones: a level-1 heading is a Part, level-2 is a Chapter, level-3 is a Section. YAML front matter at the top sets title, subtitle, author, and publisher. Checklists, definition boxes, and sidenotes use ordinary Markdown syntax, and a working example manuscript demonstrating every pattern is bundled to copy from.
+
+### Does Book Publisher send my manuscript anywhere?
+
+No. Book Publisher runs entirely on your machine. Pandoc and WeasyPrint are local tools, the build script is offline Python, and your manuscript never leaves your computer. There is no server, no account, and no telemetry.
+
+### How do I report a bug or send feedback about Book Publisher?
+
+Report bugs and feature requests at github.com/blacklogos/book-publisher/issues. For anything else, email bookpublisher@cc4.marketing. Both channels are read by the maintainer.
+
+
+## Related
+
+- [CC4.Marketing, free Claude Code course for marketers](https://cc4.marketing/)
+- [All cc4.marketing tools](https://cc4.marketing/llms.txt)
